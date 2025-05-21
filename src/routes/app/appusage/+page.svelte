@@ -217,8 +217,10 @@
         <div class="date-list" role="listbox" aria-label="Liste des dates disponibles">
           {#each allData as entry}
             <div 
+              tabindex="-1"
               class="date-item {entry.date === selectedDate ? 'selected' : ''}" 
               on:click={() => selectedDate = entry.date}
+              on:keypress={()=>{}}
               role="option"
               aria-selected={entry.date === selectedDate}
             >
