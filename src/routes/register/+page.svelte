@@ -141,7 +141,7 @@
         if (res.ok) {
           localStorage.setItem("access", data.access);                
           localStorage.setItem("refresh", data.refresh);
-          goto('/app/family');
+          goto('/family');
         } else{
           errors = {};
         if (data.username) {
