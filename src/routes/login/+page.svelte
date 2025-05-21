@@ -1,12 +1,19 @@
 <script>
   import { goto } from '$app/navigation';
-
+  import { onMount } from 'svelte';
+  import { baseurl, forceHome} from '../../stores/functions';
+  
+  
+  onMount(()=>{
+    forceHome()
+  })
 
   let username = "";
   let password = "";
   let message = "";
   let submitButton;
   let rememberMe = false;
+  let isLoading = false;
   let errors = {};
 
   function triggerSubmit() {
@@ -35,10 +42,9 @@
 
   async function handleLogin() {
     if (!validateForm()) return;
-    // bypass login
-    goto('/app/family');
+    isLoading = true
     try {
-      const res = await fetch("/api/accounts/token/parent/", {
+      const res = await fetch(`${baseurl}/accounts/token/parent/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
@@ -48,19 +54,22 @@
 
       if (res.ok) {
         //TODO: cookies ?
+        isLoading = false
         if (rememberMe) {
           localStorage.setItem("access", data.access);
         } else {
           sessionStorage.setItem("access", data.access);
         }
         localStorage.setItem("refresh", data.refresh);
-        goto('/app/family');
+        goto('/family');
       } else {
-        message = data.detail || "Échec de la connexion.";
+        message = "Échec de la connexion.";
       }
     } catch (err) {
       message = "Erreur de connexion au serveur.";
+      isLoading = false
     }
+    setTimeout(()=>{message=""}, 3000)
   }
 </script>
 
@@ -140,10 +149,13 @@
                   type="button"
                   on:click={triggerSubmit}
                   class="btn-wide btn-pill btn-shadow btn-hover-shine btn btn-custom btn-lg"
+                  disabled={isLoading}
                 >
-                  Se connecter
+                {isLoading ? "Traitement..." : "Se connecter"}
                 </button>
-                <div class="mt-3">
+
+                <div class="divider row"></div>
+                <div class="mt-3"> 
                   <a href="/register" class="text-primary">Créer un compte</a> |
                   <a href="/forgot-password" class="text-primary">Mot de passe oublié ?</a>
                 </div>

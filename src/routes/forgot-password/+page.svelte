@@ -1,48 +1,103 @@
 <script>
-  let phone_number = "";
+  import { goto } from "$app/navigation";
+  import { baseurl } from "../../stores/functions";
+
+  let input = "";
   let message = "";
   let errors = {};
+  let isLoading = false;
   let submitButton;
 
+  // Trigger form submission
   function triggerSubmit() {
     submitButton?.click();
   }
 
+  // Validate phone number
+  function isPhoneNumber(value) {
+    // Allow optional spaces, dashes, or parentheses
+    const cleaned = value.replace(/[\s()-]/g, "");
+    return /^\+\d{6,15}$/.test(cleaned);
+  }
+
+  // Validate email
+  function isEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  // Validate form before submission
   function validateForm() {
     errors = {};
-    if (!/^0[1-9][0-9]{8}$/.test(phone_number)) {
-      errors.phone_number = "Insérer un numéro valide";
+    const isPhone = isPhoneNumber(input);
+    const isValidEmail = isEmail(input);
+    const isUsername = input.trim().length > 0 && !isPhone && !isValidEmail;
+
+    if (!isPhone && !isValidEmail && !isUsername) {
+      errors.input = "Insérer un nom d'utilisateur, une adresse e-mail ou un numéro de téléphone valide (commence par '+' suivi de 6 à 15 chiffres)";
     }
     return Object.keys(errors).length === 0;
   }
 
+  // Validate input field on blur
   function validateField() {
-    errors.phone_number = /^0[1-9][0-9]{8}$/.test(phone_number)
+    errors.input = isPhoneNumber(input) || isEmail(input) || (input.trim().length > 0)
       ? ""
-      : "Insérer un numéro valide";
+      : "Insérer un nom d'utilisateur, une adresse e-mail ou un numéro de téléphone valide (commence par '+' suivi de 6 à 15 chiffres)";
   }
 
+  // Handle form submission
   async function handleSubmit() {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
+    isLoading = true
+    const isPhone = isPhoneNumber(input);
+    let payload = {};
+    let url = "/accounts/reset_password/";
+
+    if (isPhone) {
+      // Clean phone number for server
+      payload = { number: input.replace(/[\s()-]/g, "") };
+      url = "/accounts/reset_password_phone/";
+    } else {
+      payload = { username_email: input };
+    }
+
 
     try {
-      const res = await fetch("/api/accounts/reset-password/phone/", {
+      const res = await fetch(`${baseurl}${url}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone_number })
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
       if (res.ok) {
-        message = "Un code a été envoyé à votre numéro.";
-        //TODO: redirect to changepwd
+        if(data.status==200){
+          localStorage.setItem("resetInput", data.username)
+          goto("forgot-password/pin")
+        }else{
+           if (data?.error?.non_field_errors[0].includes("No user with this email or username")) {
+            errors.input = "La adresse e-mail ou le nom d'utilisateur n'existe pas";
+          }
+          if (data?.error?.number.includes("Enter a valid phone number.")) {
+            errors.input = "Le numéro de téléphone saisi n'est pas valide.";
+          } 
+        }
       } else {
-        message = data.detail || "Échec de l'envoi du code.";
-        //TODO: ask for a resend
+        console.error("Server error:", data);
+        if( data.detail)
+            message = "Aucun parent ne correspond à cette requête."
+        //message = data.detail || "Échec de l'envoi du code.";
+        // TODO: ask for a resend
       }
     } catch (err) {
-      message = "Erreur de connexion au serveur.";
+      console.error("Fetch error:", err);
+      //message = "Erreur de connexion au serveur.";
+      message = "Aucun parent ne correspond à cette requête."
     }
+    isLoading = false
+    setTimeout(()=>{message=""},3000)
   }
 </script>
 
@@ -61,21 +116,21 @@
               <div class="modal-body">
                 <h5 class="modal-title">
                   <div class="fs-2 fw-bold mb-3 text-center">Mot de passe oublié</div>
-                  <span>Entrez votre numéro de téléphone pour recevoir un code</span>
+                  <span>Entrez votre nom d'utilisateur, adresse e-mail ou numéro de téléphone pour recevoir un code</span>
                 </h5>
                 <div class="divider row"></div>
                 <form on:submit|preventDefault={handleSubmit} novalidate>
                   <div class="col">
                     <div class="position-relative mb-3">
                       <input
-                        bind:value={phone_number}
-                        placeholder="N° de téléphone"
-                        type="tel"
-                        class="form-control {errors.phone_number ? 'is-invalid' : phone_number ? 'is-valid' : ''}"
+                        bind:value={input}
+                        placeholder="Nom d'utilisateur, e-mail ou N° de téléphone (+123...)"
+                        type="text"
+                        class="form-control {errors.input ? 'is-invalid' : input ? 'is-valid' : ''}"
                         on:blur={validateField}
                       />
-                      {#if errors.phone_number}
-                        <em class="error invalid-feedback">{errors.phone_number}</em>
+                      {#if errors.input}
+                        <em class="error invalid-feedback">{errors.input}</em>
                       {/if}
                     </div>
                   </div>
@@ -83,8 +138,8 @@
                   {#if message}
                     <p class="text-danger mt-2">{message}</p>
                   {/if}
-                  <!-- svelte-ignore a11y_consider_explicit_label -->
-                  <button type="submit" class="hidden" bind:this={submitButton}></button>
+                  <!-- Hidden submit button -->
+                  <button type="submit" aria-label="Send_code" class="hidden" bind:this={submitButton}></button>
                 </form>
               </div>
               <div class="modal-footer d-block text-center">
@@ -93,8 +148,9 @@
                   on:click={triggerSubmit}
                   class="btn-wide btn-pill btn-shadow btn-hover-shine btn btn-custom btn-lg"
                 >
-                  Envoyer le code
+                {isLoading ? "Traitement..." : "Envoyer le code"}
                 </button>
+                <div class="divider row"></div>
                 <div class="mt-3">
                   <a href="/login" class="text-primary">Retour à la connexion</a>
                 </div>
