@@ -4,6 +4,7 @@
   import Child from '$lib/components/Child.svelte';
   import { baseurl, forceLogin } from '../../stores/functions';
   import Family from '$lib/components/Family.svelte';
+  import { websocketStore } from '../../stores/websockets';
 
   let showParentModal = false;
   let showChildModal = false;
@@ -12,6 +13,7 @@
   let family = {};
   let parents = [];
   let children = [];
+  let childIds = [];
 
   
   // Fetch family data
@@ -35,6 +37,7 @@
         name: data.name,
         about: data.about
       }
+      
       // Extract and format parent data
       const parentList = [data.father, data.mother].filter(p => p && p.id);
       parents = parentList.map(p => ({
@@ -51,6 +54,8 @@
         username: k.username,
         full_name: k.full_name
       }));
+      childIds = data.kids.map(kid => kid.id); // Adjust based on your API response structure
+      websocketStore.initializeWebSockets(childIds);
     } catch (error) {
       console.error('Error fetching family data:', error);
     }

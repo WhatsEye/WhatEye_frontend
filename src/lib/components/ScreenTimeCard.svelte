@@ -1,11 +1,23 @@
 <script>
   export let allData = [];
-  export let selectedDate;
-  export let selectedHour;
+  export let selectedDate; // No initial value here to allow reactive update
+  export let selectedHour = 0; // Default hour to 0
 
   let isActive = false;
 
-  $: dayData = allData.find(d => d.date === selectedDate);
+  // Reactively set selectedDate based on allData
+  $: selectedDate = allData.length > 0 
+    ? allData.reduce((latest, entry) => 
+        new Date(entry.date) > new Date(latest.date) ? entry : latest
+      ).date 
+    : new Date().toISOString().split('T')[0]; // Defaults to 2025-05-21
+
+  // Sort dates in descending order (most recent first)
+  $: availableDates = allData.length > 0 
+    ? [...allData].sort((a, b) => new Date(b.date) - new Date(a.date)) 
+    : [{ date: selectedDate }];
+
+  $: dayData = allData.find(d => d.date === selectedDate) || { date: selectedDate, hourly_usages: [] };
   $: hourUsage = dayData?.hourly_usages.find(h => h.hour === selectedHour)?.usage_seconds || 0;
   $: mins = Math.floor(hourUsage / 60);
   $: secs = hourUsage % 60;
@@ -45,7 +57,7 @@
               <span class="text-success widget-numbers fw-bold">{usageText}</span>
               <div class="d-flex align-items-center">
                 <select id="date-select" class="me-4 mt-3" bind:value={selectedDate}>
-                  {#each allData as entry}
+                  {#each availableDates as entry}
                     <option value={entry.date}>
                       {new Date(entry.date).toDateString()}
                     </option>

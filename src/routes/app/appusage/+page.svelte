@@ -1,17 +1,17 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
   import { baseurl } from '../../../stores/functions';
 
   let allData = [];
-  let selectedDate;
+  let selectedDate = null;
   let selectedHour = 0;
-  let isActive = false;
   let nextUrl = null;
   let isLoading = false;
   let errorMessage = '';
   let loadMoreTrigger;
   let observer;
 
+  // Normalize hourly usage data to ensure all 24 hours are represented
   function normalizeHourlyUsages(hourlyUsages) {
     const normalized = Array.from({ length: 24 }, (_, i) => ({
       hour: i,
@@ -23,6 +23,7 @@
     return normalized;
   }
 
+  // Debounce utility
   function debounce(fn, wait) {
     let timeout;
     return (...args) => {
@@ -31,15 +32,16 @@
     };
   }
 
+  // Fetch data from API
   async function fetchData(url) {
     if (isLoading) return;
     isLoading = true;
     errorMessage = '';
 
-    const userId = localStorage.getItem("ActiveChild");
-    const access = localStorage.getItem("access") || sessionStorage.getItem("access");
+    const userId = localStorage.getItem('ActiveChild');
+    const access = localStorage.getItem('access') || sessionStorage.getItem('access');
     if (!access || !userId) {
-      errorMessage = "Informations d'authentification manquantes. Veuillez vous reconnecter.";
+      errorMessage = 'Authentification manquante. Veuillez vous reconnecter.';
       isLoading = false;
       return;
     }
@@ -47,7 +49,7 @@
     try {
       const res = await fetch(url || `${baseurl}/control/user-usage/${userId}/hourly/`, {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${access}`
         }
       });
@@ -62,14 +64,14 @@
         nextUrl = json.next;
         if (!selectedDate && normalizedResults.length > 0) {
           selectedDate = normalizedResults[0].date;
-        } else if (!allData.some(d => d.date === selectedDate)) {
-          selectedDate = allData[0]?.date;
+        } else if (!allData.some((d) => d.date === selectedDate)) {
+          selectedDate = allData[0]?.date || null;
         }
       } else {
-        errorMessage = "Échec du chargement des données. Veuillez réessayer plus tard.";
+        errorMessage = 'Échec du chargement des données. Veuillez réessayer.';
       }
     } catch (error) {
-      errorMessage = "Une erreur est survenue lors du chargement. Vérifiez votre connexion.";
+      errorMessage = 'Erreur réseau. Vérifiez votre connexion et réessayez.';
     } finally {
       isLoading = false;
     }
@@ -77,21 +79,21 @@
 
   const debouncedFetch = debounce(fetchData, 300);
 
+  // Set up IntersectionObserver for infinite scroll
   onMount(async () => {
     await fetchData();
+    if (loadMoreTrigger) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && nextUrl && !isLoading) {
+            debouncedFetch(nextUrl);
+          }
+        },
+        { threshold: 0.1 }
+      );
+      observer.observe(loadMoreTrigger);
+    }
   });
-
-  $: if (loadMoreTrigger && !observer) {
-    observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && nextUrl && !isLoading) {
-          debouncedFetch(nextUrl);
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(loadMoreTrigger);
-  }
 
   onDestroy(() => {
     if (observer && loadMoreTrigger) {
@@ -99,14 +101,22 @@
     }
   });
 
-  $: dayData = allData.find(d => d.date === selectedDate) || { hourly_usages: Array(24).fill({ usage_seconds: 0 }) };
+  // Retry failed request
+  function retryFetch() {
+    fetchData();
+  }
+
+  // Reactive statements for UI calculations
+  $: dayData = allData.find((d) => d.date === selectedDate) || {
+    hourly_usages: Array(24).fill({ hour: 0, usage_seconds: 0 })
+  };
   $: hourUsage = dayData.hourly_usages[selectedHour]?.usage_seconds || 0;
   $: mins = Math.floor(hourUsage / 60);
   $: secs = hourUsage % 60;
   $: startHour = selectedHour.toString().padStart(2, '0');
   $: endHour = ((selectedHour + 1) % 24).toString().padStart(2, '0');
   $: usageText = `${mins}m ${secs}s`;
-  $: barWidth = (hourUsage / 3600) * 100;
+  $: barWidth = Math.min((hourUsage / 3600) * 100, 100); // Cap at 100%
   $: totalSeconds = dayData.hourly_usages.reduce((sum, h) => sum + (h.usage_seconds || 0), 0) || 0;
   $: dailyHours = Math.floor(totalSeconds / 3600);
   $: dailyMinutes = Math.floor((totalSeconds % 3600) / 60);
@@ -117,42 +127,6 @@
 <svelte:head>
   <title>WHATSEYE | Temps d’écran</title>
   <link rel="stylesheet" href="/styles/dashboard.css">
-  <style>
-    .date-list {
-      max-height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 12px;
-      font-size: 0.95rem;
-    }
-    .date-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 14px;
-      cursor: pointer;
-      border-radius: 4px;
-      margin-bottom: 6px;
-      transition: background 0.2s ease;
-    }
-   
-    .date-item:hover {
-      background-color: #f1f1f1;
-    }
-    .date-item.selected {
-      background-color: #cfefff;
-      font-weight: bold;
-    }
-    .loading, .error {
-      text-align: center;
-      padding: 10px;
-    }
-    .error {
-      color: #d32f2f;
-      font-weight: bold;
-    }
-  </style>
 </svelte:head>
 
 <div class="mb-3 card">
@@ -165,7 +139,13 @@
   <div class="p-0 card-body">
     <div class="p-3">
       {#if errorMessage}
-        <div class="error">{errorMessage}</div>
+        <div class="error" role="alert">
+          {errorMessage}
+          <button on:click={retryFetch} class="btn btn-primary ms-2">Réessayer</button>
+        </div>
+      {/if}
+      {#if isLoading && allData.length === 0}
+        <div class="loading" role="status">Chargement initial...</div>
       {/if}
       <div class="widget-chart widget-chart2 text-start p-0">
         <div class="widget-chat-wrapper-outer">
@@ -180,22 +160,34 @@
               </div>
             </div>
           </div>
-          <div class="widget-chart-wrappeHeure sélectionnée r he-auto opacity-10 m-0">
-            <div class="bar-wrapper" role="progressbar" aria-valuenow={barWidth.toFixed(1)} aria-valuemin="0" aria-valuemax="100">
-              <div class="bar-fill" style={`width: ${barWidth}%`} title={`Utilisation : ${usageText}`}></div>
+          <div class="widget-chart-wrapper opacity-10 m-0">
+            <div
+              class="bar-wrapper"
+              role="progressbar"
+              aria-valuenow={barWidth.toFixed(1)}
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-label="Utilisation horaire"
+            >
+              <div
+                class="bar-fill"
+                style="width: {barWidth}%; background-color: #28a745;"
+                title="Utilisation : {usageText}"
+              ></div>
             </div>
             <div class="d-flex flex-column align-items-center w-100">
-              <div class="mb-2 text-primary fw-bold"></div>
-              <input 
-                type="range" 
-                min="0" max="23" 
-                bind:value={selectedHour} 
-                class:active={isActive}
-                on:touchstart={() => isActive = true}
-                on:touchend={() => isActive = false}
-                aria-label="Choisir une heure"
-              >
-              <div class="slider-ticks">
+              <input
+                type="range"
+                min="0"
+                max="23"
+                bind:value={selectedHour}
+                aria-label="Sélectionner une heure"
+                aria-valuenow={selectedHour}
+                aria-valuemin="0"
+                aria-valuemax="23"
+                class="mt-2"
+              />
+              <div class="slider-ticks d-flex justify-content-between w-100">
                 <span>00:00</span>
                 <span>06:00</span>
                 <span>12:00</span>
@@ -208,41 +200,57 @@
       </div>
       <div class="p-3 mt-4 card">
         <div class="widget-chart-flex d-flex justify-content-between align-items-center">
-        <span class="widget-numbers fw-bold opacity-5">Temps total de la journée</span>
-        <span class="widget-numbers fw-bold opacity-8">{totalTimeText}</span>
+          <span class="widget-numbers fw-bold opacity-5">Temps total de la journée</span>
+          <span class="widget-numbers fw-bold opacity-8">{totalTimeText}</span>
         </div>
-    </div>
+      </div>
       <div class="mt-4">
         <h5>Sélectionner une date</h5>
         <div class="date-list" role="listbox" aria-label="Liste des dates disponibles">
-          {#each allData as entry}
-            <div 
-              tabindex="-1"
-              class="date-item {entry.date === selectedDate ? 'selected' : ''}" 
-              on:click={() => selectedDate = entry.date}
-              on:keypress={()=>{}}
-              role="option"
-              aria-selected={entry.date === selectedDate}
-            >
-              <span>{new Date(entry.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
-              <span>
-                {
-                  (() => {
-                    const total = entry.hourly_usages.reduce((sum, h) => sum + (h.usage_seconds || 0), 0);
-                    return `${Math.floor(total / 3600)}h ${Math.floor((total % 3600) / 60)}m ${total % 60}s`;
-                  })()
-                }
-              </span>
+          {#if allData.length === 0 && !isLoading}
+            <div class="placeholder" role="status" aria-live="polite">
+              <i class="placeholder-icon lnr-calendar-full"></i>
+              <p>Aucune donnée d’utilisation pour le moment.<br />Veuillez vérifier ultérieurement.</p>
             </div>
-          {/each}
-          {#if isLoading}
-            <div class="loading">Chargement en cours...</div>
+          {:else}
+            {#each allData as entry}
+              <div
+                class="date-item {entry.date === selectedDate ? 'selected' : ''}"
+                on:click={() => (selectedDate = entry.date)}
+                on:keydown={(e) => e.key === 'Enter' && (selectedDate = entry.date)}
+                role="option"
+                aria-selected={entry.date === selectedDate}
+                tabindex="0"
+              >
+                <span>
+                  {new Date(entry.date).toLocaleDateString('fr-FR', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long'
+                  })}
+                </span>
+                <span>
+                  {#if entry.hourly_usages}
+                    {(() => {
+                      const total = entry.hourly_usages.reduce((sum, h) => sum + (h.usage_seconds || 0), 0);
+                      return `${Math.floor(total / 3600)}h ${Math.floor((total % 3600) / 60)}m ${total % 60}s`;
+                    })()}
+                  {:else}
+                    0h 0m 0s
+                  {/if}
+                </span>
+              </div>
+            {/each}
+            {#if nextUrl}
+              <div bind:this={loadMoreTrigger} aria-hidden="true"></div>
+              {#if isLoading}
+                <div class="loading" role="status">Chargement des données supplémentaires...</div>
+              {/if}
+            {/if}
           {/if}
-          <div bind:this={loadMoreTrigger}></div>
         </div>
       </div>
     </div>
   </div>
-
-  
 </div>
+

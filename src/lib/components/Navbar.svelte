@@ -98,6 +98,7 @@
     <div class="app-sidebar__inner">
       <ul class="vertical-nav-menu">
         <li class="app-sidebar__heading">DashBoard</li>
+        <li><a href="/family"><i class="metismenu-icon pe-7s-users"></i>My Family</a></li>
         <li><a href="/app/dashboard"><i class="metismenu-icon pe-7s-graph2"></i>DashBoard</a></li>
         <li><a href="/app/notifications"><i class="metismenu-icon pe-7s-bell"></i>Notifications</a></li>
         <li class="app-sidebar__heading">Functionalities</li>
@@ -107,7 +108,8 @@
         <li><a href="/app/photos"><i class="metismenu-icon pe-7s-photo"></i>Photos</a></li>
         <li><a href="/app/videos"><i class="metismenu-icon pe-7s-video"></i>Videos</a></li>
         <li><a href="/app/voices"><i class="metismenu-icon pe-7s-micro"></i>Voices</a></li>
-        <li><a href="/app/documents"><i class="metismenu-icon pe-7s-file"></i>Documents</a></li>
+        <li><a href="/app/schedules"><i class="metismenu-icon lnr-calendar-full"></i>Délais Horaires</a></li>
+        <li><a href="/app/whatsapp-keyword-alert"><i class="metismenu-icon pe-7s-attention"></i>Mots clés observés</a></li>
         <li><a href="/app/appusage"><i class="metismenu-icon pe-7s-timer"></i>Time on App</a></li>
         <li><a href="/app/location"><i class="metismenu-icon pe-7s-map-marker"></i>Location</a></li>
       </ul>

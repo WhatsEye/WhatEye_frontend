@@ -1,4 +1,12 @@
-  import { goto } from '$app/navigation';
+import { goto } from '$app/navigation';
+import { writable } from 'svelte/store';
+
+export const newLocation = writable({})
+export const errorLocation = writable("")
+
+export const locationsStore = writable([]);
+export const notificationsStore = writable([]);
+
 
 
 export const baseurl = "http://127.0.0.1:8000/api"
