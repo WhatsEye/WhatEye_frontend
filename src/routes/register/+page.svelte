@@ -14,6 +14,7 @@
   let about = "";
   let familyErrors = {};
   let familyMessage = "";
+  let submitFamilyButton;
   let isLoading = false;
   let touched = { family_name: false, about: false };
 
@@ -31,6 +32,10 @@
 
   function triggerSubmit() {
     submitButton?.click();
+  }
+
+  function triggerFamilySubmit() {
+    submitFamilyButton?.click();
   }
 
   function validateFamilyForm() {
@@ -200,57 +205,59 @@
                   </h5>
                   <div class="divider row"></div>
                   <form on:submit|preventDefault={handleFamilySubmit} novalidate>
-                    <div>
-                      <div class="col">
-                        <div class="position-relative mb-3">
-                          <input
-                            bind:value={family_name}
-                            name="family_name"
-                            placeholder="Nom de la famille"
-                            type="text"
-                            class="form-control {familyErrors.family_name ? 'is-invalid' : family_name ? 'is-valid' : ''}"
-                            on:blur={() => { touched.family_name = true; validateFamilyField('family_name'); }}
-                            on:input={() => { touched.family_name = true; }}
-                          />
-                          {#if familyErrors.family_name}
-                            <em class="error invalid-feedback">{familyErrors.family_name}</em>
-                          {/if}
-                        </div>
+                    <div class="col">
+                      <div class="position-relative mb-3">
+                        <input
+                          bind:value={family_name}
+                          name="family_name"
+                          placeholder="Nom de la famille"
+                          type="text"
+                          class="form-control {familyErrors.family_name ? 'is-invalid' : family_name ? 'is-valid' : ''}"
+                          on:blur={() => { touched.family_name = true; validateFamilyField('family_name'); }}
+                          on:input={() => { touched.family_name = true; }}
+                        />
+                        {#if familyErrors.family_name}
+                          <em class="error invalid-feedback">{familyErrors.family_name}</em>
+                        {/if}
                       </div>
-                      <div class="col">
-                        <div class="position-relative mb-3">
-                          <textarea
-                            bind:value={about}
-                            name="about"
-                            placeholder="À propos de la famille"
-                            class="form-control {familyErrors.about ? 'is-invalid' : about ? 'is-valid' : ''}"
-                            on:blur={() => { touched.about = true; validateFamilyField('about'); }}
-                            on:input={() => { touched.about = true; }}
-                          ></textarea>
-                          {#if familyErrors.about}
-                            <em class="error invalid-feedback">{familyErrors.about}</em>
-                          {/if}
-                        </div>
+                    </div>
+                    <div class="col">
+                      <div class="position-relative mb-3">
+                        <textarea
+                          bind:value={about}
+                          name="about"
+                          placeholder="À propos de la famille"
+                          class="form-control {familyErrors.about ? 'is-invalid' : about ? 'is-valid' : ''}"
+                          on:blur={() => { touched.about = true; validateFamilyField('about'); }}
+                          on:input={() => { touched.about = true; }}
+                        ></textarea>
+                        {#if familyErrors.about}
+                          <em class="error invalid-feedback">{familyErrors.about}</em>
+                        {/if}
                       </div>
                     </div>
                     {#if familyMessage}
                       <p class="text-danger mt-2">{familyMessage}</p>
                     {/if}
-                    <div class="modal-footer d-block text-center">
-                      <button type="submit" class="btn-wide btn-pill btn-shadow btn-hover-shine btn btn-custom btn-lg">
-                      {isLoading ? "Traitement..." : "Continuer"}
-                      </button>
-                    </div>
-                     <div class="divider row"></div>
-                    <h6 class="mb-3">
-                      Vous possedez déja un compte?
-                      <a href="/login" class="text-primary">Se connecter</a> |
-                      <a href="/forgot-password" class="text-primary">Recuperer mot de passe</a>
-                    </h6>
+                    <!-- svelte-ignore a11y_consider_explicit_label -->
+                    <button type="submit" class="hidden" bind:this={submitFamilyButton}></button>
                   </form>
-                 
                 </div>
-                
+                <div class="modal-footer d-block text-center">
+                  <button 
+                  type="button" 
+                  on:click={triggerFamilySubmit}
+                  class="btn-wide btn-pill btn-shadow btn-hover-shine btn btn-custom btn-lg"
+                  disabled={isLoading}>
+                    {isLoading ? "Traitement..." : "Continuer"}
+                  </button>
+                  <div class="divider row"></div>
+                  <div class="mt-3">
+                    Vous possedez déja un compte? <br/>
+                    <a href="/login" class="text-primary">Se connecter</a> |
+                    <a href="/forgot-password" class="text-primary">Recuperer le mot de passe</a>
+                  </div>
+                </div>  
               {/if}
 
               {#if step === 2}
