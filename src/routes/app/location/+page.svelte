@@ -300,9 +300,9 @@ $:   if (loadMoreTrigger) {
     {/if}
   </div>
   <div class="p-0 card-body d-flex flex-column">
-    {#if isLoading && locations.length === 0}
+    <!-- {#if isLoading && locations.length === 0}
       <div class="loading" role="status">Chargement initial...</div>
-    {/if}
+    {/if} -->
     <div
       class="map2"
       bind:this={mapContainer}
@@ -316,7 +316,12 @@ $:   if (loadMoreTrigger) {
       role="listbox"
       aria-label="Liste des localisations précédentes"
     >
-      {#if locations.length === 0 && !isLoading}
+     {#if isLoading && locations.length === 0}
+          <div class="loading" role="status">
+            <div class="spinner"></div>
+            Chargement en cours...
+          </div>
+      {:else if locations.length === 0 && !isLoading}
         <div class="placeholder" role="status" aria-live="polite">
           <i class="placeholder-icon lnr-map"></i>
           <p>Aucune localisation pour le moment.<br />Utilisez ‘Trouve-moi’ pour commencer à suivre.</p>

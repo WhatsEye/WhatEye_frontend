@@ -106,8 +106,16 @@
         <li><a href="/app/chats"><i class="metismenu-icon pe-7s-chat"></i>Chats</a></li>
         <li><a href="/app/calls"><i class="metismenu-icon pe-7s-call"></i>Calls</a></li>
         <li><a href="/app/photos"><i class="metismenu-icon pe-7s-photo"></i>Photos</a></li>
-        <li><a href="/app/videos"><i class="metismenu-icon pe-7s-video"></i>Videos</a></li>
-        <li><a href="/app/voices"><i class="metismenu-icon pe-7s-micro"></i>Voices</a></li>
+        <li>
+          <a href="" aria-expanded="false">
+              <i class="metismenu-icon pe-7s-folder"></i>Call Records
+              <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+          </a>
+          <ul>
+              <li><a href="/app/videos"><i class="metismenu-icon pe-7s-video"></i>Videos</a></li>
+              <li><a href="/app/voices"><i class="metismenu-icon pe-7s-micro"></i>Voices</a></li>
+          </ul>
+      </li>
         <li><a href="/app/schedules"><i class="metismenu-icon lnr-calendar-full"></i>Délais Horaires</a></li>
         <li><a href="/app/whatsapp-keyword-alert"><i class="metismenu-icon pe-7s-attention"></i>Mots clés observés</a></li>
         <li><a href="/app/appusage"><i class="metismenu-icon pe-7s-timer"></i>Time on App</a></li>

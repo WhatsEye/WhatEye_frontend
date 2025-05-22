@@ -143,9 +143,7 @@
           {errorMessage}
         </div>
       {/if}
-      {#if isLoading && allData.length === 0}
-        <div class="loading" role="status">Chargement initial...</div>
-      {/if}
+   
       <div class="widget-chart widget-chart2 text-start p-0">
         <div class="widget-chat-wrapper-outer">
           <div class="widget-chart-content widget-chart-content-lg pb-0">
@@ -206,7 +204,12 @@
       <div class="mt-4">
         <h5>Sélectionner une date</h5>
         <div class="date-list" role="listbox" aria-label="Liste des dates disponibles">
-          {#if allData.length === 0 && !isLoading}
+          {#if isLoading && allData.length === 0}
+          <div class="loading" role="status" aria-live="polite">
+            <div class="spinner"></div>
+            Chargement en cours...
+          </div>
+          {:else if allData.length === 0 && !isLoading}
             <div class="placeholder" role="status" aria-live="polite">
               <i class="placeholder-icon lnr-calendar-full"></i>
               <p>Aucune donnée d’utilisation pour le moment.<br />Veuillez vérifier ultérieurement.</p>

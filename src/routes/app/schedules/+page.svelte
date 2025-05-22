@@ -259,7 +259,7 @@
       <div class="alert {errorMessage.includes('succès') ? 'alert-success' : 'alert-error'}" role="alert">{errorMessage}</div>
     {/if}
 
-    <button class="btn btn-primary" on:click={() => showAddForm = !showAddForm} aria-label={showAddForm ? 'Annuler le formulaire' : 'Ajouter un horaire'}>
+    <button class="btn btn-primary fs-5" on:click={() => showAddForm = !showAddForm} aria-label={showAddForm ? 'Annuler le formulaire' : 'Ajouter un horaire'}>
       {showAddForm ? 'Annuler' : 'Ajouter un horaire'}
     </button>
 
@@ -363,7 +363,10 @@
 
     <div class="schedule-list" role="listbox" aria-label="Liste des horaires">
       {#if isLoading && schedules.length === 0}
-        <div class="loading" role="status">Chargement en cours...</div>
+        <div class="loading" role="status" aria-live="polite">
+            <div class="spinner"></div>
+            Chargement en cours...
+          </div>
       {:else if schedules.length === 0}
         <div class="placeholder" role="status" aria-live="polite">
           <i class="placeholder-icon lnr-calendar-full"></i>

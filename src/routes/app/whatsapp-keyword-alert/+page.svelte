@@ -179,7 +179,10 @@
 
     <div class="word-list" role="listbox" aria-label="Liste des mots interdits">
       {#if isLoading}
-        <div class="loading" role="status">Chargement en cours...</div>
+        <div class="loading" role="status" aria-live="polite">
+            <div class="spinner"></div>
+            Chargement en cours...
+          </div>
       {:else if badWords.length === 0}
         <div class="placeholder" role="status" aria-live="polite">
           <i class="placeholder-icon lnr-warning"></i>
