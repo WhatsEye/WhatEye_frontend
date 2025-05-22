@@ -139,9 +139,8 @@
   <div class="p-0 card-body">
     <div class="p-3">
       {#if errorMessage}
-        <div class="error" role="alert">
+      <div class="alert {errorMessage.includes('succès') ? 'alert-success' : 'alert-error'}" role="alert"> 
           {errorMessage}
-          <button on:click={retryFetch} class="btn btn-primary ms-2">Réessayer</button>
         </div>
       {/if}
       {#if isLoading && allData.length === 0}

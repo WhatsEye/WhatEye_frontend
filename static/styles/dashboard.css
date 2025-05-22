@@ -403,7 +403,7 @@ select {
 
   .alert {
     padding: 1rem;
-    margin: 12px 12px;
+    margin: 8px;
     border-radius: 4px;
   }
   .alert-success {

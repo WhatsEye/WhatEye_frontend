@@ -255,14 +255,13 @@ $:   if (loadMoreTrigger) {
     try {
       isLoading = true;
       errorMessage = '';
-      const timeout = setTimeout(() => {
+      setTimeout(() => {
         if (isLoading) {
           errorMessage = 'Délai d’attente dépassé pour la réponse de localisation.';
           isLoading = false;
         }
-      }, 10000);
+      }, 15000);
       await websocketStore.getLocation(userId);
-      clearTimeout(timeout);
     } catch (error) {
       errorMessage = `Erreur lors de la recherche de localisation: ${error.message}`;
       isLoading = false;
@@ -294,18 +293,13 @@ $:   if (loadMoreTrigger) {
       Localisation
     </div>
   </div>
-  <div class="p-0 card-body d-flex flex-column">
-    {#if errorMessage}
-      <div
-        class="alert {errorMessage.includes('succès') ? 'alert-success' : 'alert-error'}"
-        role="alert"
-      >
-        {errorMessage}
-        {#if !errorMessage.includes('succès')}
-          <button on:click={retryFetch} class="btn btn-primary ms-2">Réessayer</button>
-        {/if}
-      </div>
+  <div class=" m-3">
+  {#if errorMessage}
+      <div class="alert {errorMessage.includes('succès') ? 'alert-success' : 'alert-error'}" role="alert"> 
+         {errorMessage}</div>
     {/if}
+  </div>
+  <div class="p-0 card-body d-flex flex-column">
     {#if isLoading && locations.length === 0}
       <div class="loading" role="status">Chargement initial...</div>
     {/if}
