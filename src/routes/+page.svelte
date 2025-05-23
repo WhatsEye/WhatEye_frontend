@@ -5,7 +5,7 @@
   onMount(() => {
     const accessToken = localStorage.getItem('access');
     if (accessToken) {
-      goto('app/family');
+      goto('/family');
     } else {
       goto('/login');
     }

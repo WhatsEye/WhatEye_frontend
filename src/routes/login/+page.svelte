@@ -53,7 +53,6 @@
       const data = await res.json();
 
       if (res.ok) {
-        //TODO: cookies ?
         isLoading = false
         if (rememberMe) {
           localStorage.setItem("access", data.access);
@@ -64,6 +63,7 @@
         goto('/family');
       } else {
         message = "Échec de la connexion.";
+        isLoading = false
       }
     } catch (err) {
       message = "Erreur de connexion au serveur.";
@@ -151,7 +151,7 @@
                   class="btn-wide btn-pill btn-shadow btn-hover-shine btn btn-custom btn-lg"
                   disabled={isLoading}
                 >
-                {isLoading ? "Traitement..." : "Se connecter"}
+                  {isLoading ? "Traitement..." : "Se connecter"}
                 </button>
 
                 <div class="divider row"></div>
