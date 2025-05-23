@@ -32,8 +32,8 @@ export const getProfileShortInfo = async (username) => {
 
 export const setLogedIn = async () => {
     const access = localStorage.getItem("access")
-    // const token = jwtDecode(access)
-    // profileId.set(token['pid'])
+    const token = jwtDecode(access)
+    profileId.set(token['id'])
     // localStorage.setItem("pid", token['pid'])
     config.headers.Authorization = `Bearer ${access}`
 }

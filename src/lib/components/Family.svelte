@@ -2,43 +2,145 @@
   export let family = {};
 </script>
 
-<div class="mb-3 card p-3 rounded-3">
-  <div class="d-flex flex-column align-items-center">
-    <!-- svelte-ignore a11y_img_redundant_alt -->
+<div class="card-container">
+  <div class="card-content">
     <img
       src={family.photo}
       alt={`${family.name}'s Family Picture`}
-      class="family-img rounded-circle mb-3 border border-4 border-sky-200"
+      class="family-img"
+      loading="lazy"
     />
-    <div class="text-center flex-grow-1">
-      <h2 class="h5 fw-bolder text-dark">{family.name}</h2>
-      <p class="text-sky-600 mb-1">{family.about}</p>
-      <p class="small text-muted mt-1">Family ID: {family.id}</p>
+    <div class="text-content">
+      <h2 class="family-name">{family.name}</h2>
+      <p class="family-about">{family.about}</p>
+      <p class="family-id">Family ID: {family.id}</p>
     </div>
-    <div class="mt-3 d-flex flex-column flex-sm-row">
-      <button
-        class="btn btn-primary btn-sm fw-medium py-1 px-2 rounded d-flex align-items-center justify-content-center mb-2 mb-sm-0 me-sm-2"
-      >
-        View Activity
-      </button>
-      <button
-        class="btn btn-light btn-sm fw-medium py-1 px-2 rounded d-flex align-items-center justify-content-center border"
-      >
-        <i class="fas fa-cog me-2"></i> Settings
-      </button>
+    <div class="button-group">
+      
+      <div class="flex space-x-3 mt-2">
+          <button
+            class="flex  items-center bg-gray-200 px-3 py-1 border border-gray-600 rounded-full text-gray-900 text-sm hover:bg-gray-100 transition"
+            on:click={() => onSettings(child)}
+            aria-label="Paramètres"
+          >
+            <i class="lnr lnr-cog  mr-1 mt-1"></i>
+            Paramètres
+          </button>
+        </div>
     </div>
   </div>
 </div>
 
 <style>
+  .card-container {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
   .family-img {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #bae6fd;
+    object-fit: cover;
+    transition: transform 0.3s ease;
   }
-  .text-sky-600 {
-    color: #0284c7 !important;
+
+  .family-img:hover {
+    transform: scale(1.05);
   }
-  .border-sky-200 {
-    border-color: #bae6fd !important;
+
+  .text-content {
+    text-align: center;
+  }
+
+  .family-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .family-about {
+    font-size: 1rem;
+    color: #0284c7;
+    margin: 0.25rem 0;
+    line-height: 1.4;
+  }
+
+  .family-id {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background-color: #0284c7;
+    color: #ffffff;
+  }
+
+  .btn-primary:hover {
+    background-color: #026aa7;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background-color: #f1f5f9;
+    color: #1e293b;
+    border: 1px solid #e2e8f0;
+  }
+
+  .btn-secondary:hover {
+    background-color: #e2e8f0;
+    transform: translateY(-2px);
+  }
+
+  @media (min-width: 640px) {
+    .button-group {
+      flex-direction: row;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 0.5rem 1.25rem;
+    }
   }
 </style>

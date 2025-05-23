@@ -1,7 +1,6 @@
 <script>
   import PwdModal from '$lib/components/PwdModal.svelte';
 
-  
   let showModal = false;
   let appFeedbackMessage = ''; 
 

@@ -14,22 +14,20 @@
       <div class="text-center text-sm-start flex-grow-1">
         <h2 class="h5 fw-bolder text-dark">{parent.full_name || parent.username}</h2>
         <p class="{index % 2 === 0 ? 'text-sky-600' : 'text-red-600'} mb-1">
-          {parent.username === 'azax' ? 'Father' : 'Mother'}
+            {parent.username === 'azax' ? 'Père' : 'Mère'}
         </p>
         <p class="small text-muted mt-1">Member of Family</p>
       </div>
-      <div class="mt-3 mt-sm-0 ms-sm-auto d-flex flex-column flex-sm-row">
-        <button
-          class="btn btn-primary btn-sm fw-medium py-1 px-2 rounded d-flex align-items-center justify-content-center mb-2 mb-sm-0 me-sm-2"
-        >
-          View Activity
-        </button>
-        <button
-          class="btn btn-light btn-sm fw-medium py-1 px-2 rounded d-flex align-items-center justify-content-center border"
-        >
-          Settings
-        </button>
-      </div>
+      <div class="flex space-x-3 mt-2">
+          <button
+            class="flex  items-center bg-gray-200 px-3 py-1 border border-gray-600 rounded-full text-gray-900 text-sm hover:bg-gray-100 transition"
+            on:click={() => onSettings(child)}
+            aria-label="Paramètres"
+          >
+            <i class="lnr lnr-cog  mr-1 mt-1"></i>
+            Paramètres
+          </button>
+        </div>
     </div>
   </div>
 {/each}
