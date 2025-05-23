@@ -1,14 +1,25 @@
 <script>
     import Message from '$lib/components/Message.svelte';
+    import { createEventDispatcher } from 'svelte';
+
+    const dispatch = createEventDispatcher();
+
+    let hamburgerActive = false;
+
+    function handleMobileMenuButtonClick() {
+        hamburgerActive = !hamburgerActive;
+        dispatch('toggleAppMenu');
+    }
 </script>
 
 <div class="table-responsive">
     <!-- Discussion header -->
-    <div class="app-inner-layout__top-pane">
+    <div class="app-inner-layout__top-pane flex-sm-row">
         <div class="pane-left">
-            <div class="mobile-app-menu-btn">
-                <!-- svelte-ignore a11y_consider_explicit_label -->
-                <button type="button" class="hamburger hamburger--elastic">
+            <div class="mobile-app-menu-btn" on:click={handleMobileMenuButtonClick} role="button" tabindex="0" 
+                aria-label="Toggle mobile menu" 
+                on:keydown={(e) => e.key === 'Enter' && handleMobileMenuButtonClick()}>
+                <button type="button" class="hamburger hamburger--elastic" class:is-active={hamburgerActive}>
                     <span class="hamburger-box">
                         <span class="hamburger-inner"></span>
                     </span>
@@ -22,12 +33,13 @@
             <h4 class="mb-0 text-nowrap fw-bold">
                 Contact name / Group name
                 <div class="opacity-7 fw-lighter">
-                    something here
+                    something here / 12 Membres
                 </div>
             </h4>
         </div>
         <div class="pane-right">
-            <button type="button" class="btn btn-outline-warning mb-2 me-2">Blocker l'utilisateur / Quitter le groupe</button>
+            <button type="button" class="btn btn-outline-secondary mb-2 me-2">Voir les membres</button>
+            <button type="button" class="btn btn-outline-warning mb-2 me-2">Blocker l'utilisateur || Quitter le groupe</button>
         </div>
     </div>
     <div class="chat-wrapper">

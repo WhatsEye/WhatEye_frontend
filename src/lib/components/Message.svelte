@@ -2,12 +2,14 @@
 <div class="chat-box-wrapper">
     <div>
         <div class="avatar-icon-wrapper me-1">
-            <div class="avatar-icon avatar-icon-lg rounded">
+            <div class="avatar-icon avatar-icon-lg rounded-circle me-2">
                 <img src="https://placehold.co/150x150/EFEFEF/AAAAAA&text=Photo" alt="">
             </div>
         </div>
     </div>
     <div>
+        <!-- if group -->
+        <div class="opacity-6 small mb-2 fw-bolder">Member name</div>
         <div class="chat-box">
             Actual msg
         </div>
@@ -23,7 +25,7 @@
     <div class="chat-box-wrapper chat-box-wrapper-right">
         <div>
             <div class="chat-box">
-                Actual msg
+                Actual message
             </div>
             <small class="opacity-6">
                 <i class="lnr-calendar-full me-1"></i>
