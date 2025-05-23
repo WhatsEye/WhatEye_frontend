@@ -4,6 +4,8 @@ import { writable } from 'svelte/store';
 export const newLocation = writable({})
 export const errorLocation = writable("")
 
+export const contactsStore = writable([]);
+export const contactsArrivedStore = writable(false);
 export const locationsStore = writable([]);
 export const notificationsStore = writable([]);
 

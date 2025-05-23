@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { errorLocation, newLocation } from './functions';
+import { contactsArrivedStore, contactsStore, errorLocation, newLocation } from './functions';
 
 
 const connectedId = writable([])
@@ -75,9 +75,24 @@ function createWebSocketStore() {
             case 'PIN_CHANGE':
               childStore.pin = data.new_pin;
               break;
-            case 'RESPONSE_CONTACT':
-              childStore.contacts = data.contacts;
-              break;
+           case 'RESPONSE_CONTACT':
+                try {
+                    // Validate data.contacts exists
+                    if (!data.contacts || typeof data.contacts !== 'string') {
+                        console.error('Invalid or missing contacts data');
+                        return;
+                    }
+
+                    // Handle potential double-stringification
+                    let parsedContacts = JSON.parse(data.contacts);
+                    parsedContacts= JSON.parse(new Array(parsedContacts)[0])
+                    contactsStore.set(parsedContacts);
+                    contactsArrivedStore.set(true);
+                } catch (error) {
+                    console.error('Error processing contacts:', error.message);
+                }
+                break;
+            
             case 'RESPONSE_CURRENT_CHATS':
               childStore.chats = data.contacts;
               break;

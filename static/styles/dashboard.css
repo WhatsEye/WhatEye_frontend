@@ -623,15 +623,16 @@ select {
     }
   
    
-  .spinner {
-    width: 24px;
-    height: 24px;
-    border: 3px solid var(--secondary-text);
-    border-top-color: var(--primary-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
   
+   .spinner {
+        border: 4px solid #e5e5e5;
+        border-top: 4px solid #00a884;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        animation: spin 0.8s linear infinite;
+        margin-bottom: 1rem;
+    }
 
 
   :root {
@@ -899,7 +900,112 @@ select {
     height: 20px;
   }
 
+  .contact-list {
+        flex: 1;
+        overflow-y: auto;
+        background-color: #ffffff;
+        border-radius: 0 0 12px 12px;
+        max-height: 540px;
+        height: 1vh;
+        scrollbar-width: thin;
+        scrollbar-color: #00a884 #f0f0f0;
+    }
+    .contact-list::-webkit-scrollbar {
+        width: 6px;
+    }
+    .contact-list::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 8px;
+    }
+    .contact-list::-webkit-scrollbar-thumb {
+        background: #00a884;
+        border-radius: 8px;
+    }
+    .letter-group {
+        background-color: #f7f8f9;
+        padding: 0.75rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #1a2527;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        border-bottom: 1px solid #e5e5e5;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .contact-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.25rem;
+        border-bottom: 1px solid #f2f2f2;
+        transition: background-color 0.2s ease;
+        animation: fadeIn 0.3s ease-in;
+    }
+    .contact-item:hover, .contact-item:focus {
+        background-color: #f8f9fa;
+        outline: none;
+    }
+    .contact-item:focus {
+        box-shadow: inset 0 0 0 2px #00a884;
+    }
+    .contact-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background-color: #25d366;
+        margin-right: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: #ffffff;
+        position: relative;
+        flex-shrink: 0;
+    }
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #34c759;
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        border: 2px solid #ffffff;
+        transition: opacity 0.3s ease;
+    }
+    .status-indicator.offline {
+        background-color: #b0bec5;
+    }
+    .contact-details {
+        flex: 1;
+        min-width: 0;
+    }
+    .contact-name {
+        font-weight: 500;
+        font-size: 1.05rem;
+        color: #1a2527;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .contact-about {
+        color: #5e6d74;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        line-height: 1.4;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
  
+    @media (max-width: 600px) {
+
+        .contact-list {
+            max-height: 300px;
+        }
+    }
+
  
   
      @keyframes fadeIn {
