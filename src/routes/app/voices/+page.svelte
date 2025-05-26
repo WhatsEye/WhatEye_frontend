@@ -416,5 +416,8 @@
 </main>
 
 
-
-
+<style>
+  .popup-audio-player{
+    width: 100%;
+  }
+</style>

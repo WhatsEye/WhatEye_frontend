@@ -80,9 +80,9 @@
 	// Validate email in real-time
 	function validateEmail() {
 		if (!parentEmail) {
-			emailError = 'Email is required.';
+    		emailError = 'L\'email est requis.';
 		} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(parentEmail)) {
-			emailError = 'Please enter a valid email address.';
+    		emailError = 'Veuillez entrer une adresse email valide.';
 		} else {
 			emailError = '';
 		}
@@ -119,8 +119,8 @@
 				isSubmitting = false;
 			}
 		} catch (error) {
-			console.error('Error inviting parent:', error);
-			emailError = 'An error occurred while sending the invitation.';
+			console.error('Erreur lors de l\'invitation du parent:', error);
+			emailError = 'Une erreur est survenue lors de l\'envoi de l\'invitation.';
 			isSubmitting = false;
 		}
 	}
@@ -141,24 +141,24 @@
 			<Parent {parents} />
 
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-				<button
-					class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg shadow-md flex items-center justify-center transition duration-300 transform hover:scale-105"
-					on:click={() => showParentModal = true}
-				>
-					<i class="pe-7s-add-user mr-2 text-lg"></i> Invite Parent
-				</button>
-				<button
-					class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-lg shadow-md flex items-center justify-center transition duration-300 transform hover:scale-105"
-					on:click={() => showChildRegisterModal = true}
-				>
-					Register Child
-				</button>
-				<button
-					class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-md flex items-center justify-center transition duration-300 transform hover:scale-105"
-					on:click={() => showChildLoginModal = true}
-				>
-					Child Login
-				</button>
+			<button
+				class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg shadow-md flex items-center justify-center transition duration-300 transform hover:scale-105"
+				on:click={() => showParentModal = true}
+			>
+				<i class="pe-7s-add-user mr-2 text-lg"></i> Inviter un parent
+			</button>
+			<button
+				class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-lg shadow-md flex items-center justify-center transition duration-300 transform hover:scale-105"
+				on:click={() => showChildRegisterModal = true}
+			>
+				Inscription de l'enfant
+			</button>
+			<button
+				class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-md flex items-center justify-center transition duration-300 transform hover:scale-105"
+				on:click={() => showChildLoginModal = true}
+			>
+				Connexion enfant
+			</button>
 			</div>
 
 		<div class=" bg-gray-50 rounded-lg shadow-md">
@@ -173,97 +173,100 @@
 
 			<!-- Parent Invitation Modal -->
 			{#if showParentModal}
-				<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-					<div class="bg-white rounded-xl p-6 max-w-md w-full transform transition-all duration-300 scale-0 animate-scale-in">
-						<h5 class="text-xl font-bold text-gray-800 mb-4">Invite a Parent</h5>
-						<div class="relative">
-							<input
-								type="email"
-								placeholder="Enter email address"
-								bind:value={parentEmail}
-								on:input={validateEmail}
-								class="w-full p-3 border {emailError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200"
-							/>
-							{#if emailError}
-								<p class="text-red-500 text-sm mt-1">{emailError}</p>
-							{/if}
-						</div>
-						<div class="flex justify-end mt-4">
-							<button
-								class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg mr-2 transition duration-200"
-								on:click={() => showParentModal = false}
-							>
-								Cancel
-							</button>
-							<button
-								class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center transition duration-200"
-								on:click={inviteParent}
-								disabled={isSubmitting || emailError}
-							>
-								{#if isSubmitting}
-									<svg class="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-										<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-										<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z"></path>
-									</svg>
-									Sending...
-								{:else if inviteSuccess}
-									<svg class="h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-									</svg>
-									Sent!
-								{:else}
-									Send Invitation
-								{/if}
-							</button>
-						</div>
+			
+			<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+				<div class="bg-white rounded-xl p-6 max-w-md w-full transform transition-all duration-300 scale-0 animate-scale-in">
+					<h5 class="text-xl font-bold text-gray-800 mb-4">Inviter un parent</h5>
+					<div class="relative">
+					<input
+						type="email"
+						placeholder="Entrer l'adresse email"
+						bind:value={parentEmail}
+						on:input={validateEmail}
+						class="w-full p-3 border {emailError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200"
+					/>
+					{#if emailError}
+						<p class="text-red-500 text-sm mt-1">{emailError}</p>
+					{/if}
 					</div>
+					<div class="flex justify-end mt-4">
+					<button
+						class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg mr-2 transition duration-200"
+						on:click={() => showParentModal = false}
+					>
+						Annuler
+					</button>
+					<button
+						class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center transition duration-200"
+						on:click={inviteParent}
+						disabled={isSubmitting || emailError}
+					>
+						{#if isSubmitting}
+						<svg class="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z"></path>
+						</svg>
+						Envoi...
+						{:else if inviteSuccess}
+						<svg class="h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+						</svg>
+						Envoyé !
+						{:else}
+						Envoyer l'invitation
+						{/if}
+					</button>
+					</div>
+				</div>
 				</div>
 			{/if}
 
 			<!-- Child Login QR Modal -->
 			{#if showChildLoginModal}
 				<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-					<div class="bg-white rounded-xl p-6 max-w-md w-full text-center transform transition-all duration-300 scale-0 animate-scale-in">
-						<h5 class="text-xl font-bold text-blue-600 mb-4">Scan QR for Child Login</h5>
-						{#if parentQr}
-							<div class="p-4 bg-blue-50 rounded-lg shadow-inner">
-								<img src={parentQr} alt="Parent QR Code" class="mx-auto my-3 max-w-xs" />
-							</div>
-							<p class="text-gray-600 mt-2">Scan this QR code to log in as a child.</p>
-						{:else}
-							<p class="text-red-500">No QR code available for this parent.</p>
-						{/if}
-						<button
-							class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg mt-4 transition duration-200"
-							on:click={() => showChildLoginModal = false}
-						>
-							Close
-						</button>
-					</div>
+			<div class="bg-white rounded-xl p-6 max-w-md w-full text-center transform transition-all duration-300 scale-0 animate-scale-in">
+				<h5 class="text-xl font-bold text-blue-600 mb-4">Scannez le QR pour la connexion enfant</h5>
+				<p class="mb-4 text-gray-700">Veuillez noter : ce code QR est valable pour un seul usage. Après l'avoir scanné, il ne sera plus valide.</p>
+				{#if parentQr}
+				<div class="p-4 bg-blue-50 rounded-lg shadow-inner">
+					<img src={parentQr} alt="Code QR Parent" class="mx-auto my-3 max-w-xs" />
 				</div>
+				<p class="text-gray-600 mt-2">Scannez ce code QR pour vous connecter en tant qu'enfant.</p>
+				{:else}
+				<p class="text-red-500">Aucun code QR disponible pour ce parent.</p>
+				{/if}
+				<button
+				class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg mt-4 transition duration-200"
+				on:click={() => showChildLoginModal = false}
+				>
+				Fermer
+				</button>
+			</div>
+			</div>
 			{/if}
 
 			<!-- Child Registration QR Modal -->
 			{#if showChildRegisterModal}
 				<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-					<div class="bg-white rounded-xl p-6 max-w-md w-full text-center transform transition-all duration-300 scale-0 animate-scale-in">
-						<h5 class="text-xl font-bold text-yellow-600 mb-4">Scan QR to Register Child</h5>
-						{#if familyQr}
-							<div class="p-4 bg-yellow-50 rounded-lg shadow-inner">
-								<img src={familyQr} alt="Family QR Code" class="mx-auto my-3 max-w-xs" />
-							</div>
-							<p class="text-gray-600 mt-2">Scan this QR code to register a new child.</p>
-						{:else}
-							<p class="text-red-500">No QR code available for family registration.</p>
-						{/if}
-						<button
-							class="btn bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg mt-4 transition duration-200"
-							on:click={() => showChildRegisterModal = false}
-						>
-							Close
-						</button>
-					</div>
+			<div class="bg-white rounded-xl p-6 max-w-md w-full text-center transform transition-all duration-300 scale-0 animate-scale-in">
+				<h5 class="text-xl font-bold text-yellow-600 mb-4">Scannez le QR pour inscrire un enfant</h5>
+				<p class="text-gray-700 mb-4">Veuillez noter : ce code QR est valable pour un seul usage. Après l'avoir scanné, il ne sera plus valide.</p>
+				{#if familyQr}
+				<div class="p-4 bg-yellow-50 rounded-lg shadow-inner">
+					<img src={familyQr} alt="Code QR familial" class="mx-auto my-3 max-w-xs" />
 				</div>
+				<p class="text-gray-600 mt-2">Scannez ce code QR pour inscrire un nouvel enfant.</p>
+				{:else}
+				<p class="text-red-500">Aucun code QR disponible pour l'inscription familiale.</p>
+				{/if}
+				<button
+				class="btn bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg mt-4 transition duration-200"
+				on:click={() => showChildRegisterModal = false}
+				>
+				Fermer
+				</button>
+			</div>
+			</div>
 			{/if}
 		</div>
 	</div>

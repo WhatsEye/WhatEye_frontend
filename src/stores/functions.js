@@ -5,7 +5,14 @@ export const newLocation = writable({})
 export const errorLocation = writable("")
 
 export const contactsStore = writable([]);
+export const contactsChatStore = writable([]);
+export const filesStore = writable([]);
+export const filesArrivedStore = writable(false);
+export const fileUriArrivedStore = writable(false);
+export const fileUriBase64Store = writable("");
+export const contactsChatArrivedStore = writable(false);
 export const contactsArrivedStore = writable(false);
+export const contactBlockedArrivedStore = writable(false);
 export const locationsStore = writable([]);
 export const notificationsStore = writable([]);
 

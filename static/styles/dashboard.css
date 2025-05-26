@@ -905,7 +905,7 @@ select {
         overflow-y: auto;
         background-color: #ffffff;
         border-radius: 0 0 12px 12px;
-        max-height: 540px;
+        max-height: 560px;
         height: 1vh;
         scrollbar-width: thin;
         scrollbar-color: #00a884 #f0f0f0;
@@ -1071,41 +1071,6 @@ select {
     width: 100%;
   }
 
-  .btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .btn-primary {
-    background-color: #0284c7;
-    color: #ffffff;
-  }
-
-  .btn-primary:hover {
-    background-color: #026aa7;
-    transform: translateY(-2px);
-  }
-
-  .btn-secondary {
-    background-color: #f1f5f9;
-    color: #1e293b;
-    border: 1px solid #e2e8f0;
-  }
-
-  .btn-secondary:hover {
-    background-color: #e2e8f0;
-    transform: translateY(-2px);
-  }
 
   @media (min-width: 640px) {
     .button-group {

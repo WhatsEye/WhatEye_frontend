@@ -14667,10 +14667,7 @@ legend {
 .widget-numbers-sm {
   font-size: 1.5rem; }
 
-.widget-content {
-  padding: 1rem;
-  flex-direction: row;
-  align-items: center; }
+
   .widget-content .widget-content-wrapper {
     display: flex;
     flex: 1;

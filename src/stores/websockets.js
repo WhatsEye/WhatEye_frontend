@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { contactsArrivedStore, contactsStore, errorLocation, newLocation } from './functions';
+import { contactsArrivedStore, contactsStore, contactsChatStore,errorLocation, newLocation, contactsChatArrivedStore, contactBlockedArrivedStore, filesArrivedStore, filesStore, fileUriArrivedStore, fileUriBase64Store } from './functions';
 
 
 const connectedId = writable([])
@@ -94,10 +94,37 @@ function createWebSocketStore() {
                 break;
             
             case 'RESPONSE_CURRENT_CHATS':
-              childStore.chats = data.contacts;
-              break;
+               try {
+                    // Validate data.contacts exists
+                    if (!data.contacts || typeof data.contacts !== 'string') {
+                        console.error('Invalid or missing contacts data');
+                        return;
+                    }
+
+                    // Handle potential double-stringification
+                    let parsedContactsChat = JSON.parse(data.contacts);
+                    parsedContactsChat= JSON.parse(new Array(parsedContactsChat)[0])
+                    contactsChatStore.set(parsedContactsChat);
+                    contactsChatArrivedStore.set(true);
+                } catch (error) {
+                    console.error('Error processing contacts:', error.message);
+                }
+                break;
             case 'RESPONSE_CHAT':
               childStore.chats = [...childStore.chats, ...data.chats];
+              break;
+            
+            case 'RESPONSE_BLOCK_CHAT':
+              contactBlockedArrivedStore.set(true)
+              break;
+            case 'RESPONSE_FILES':
+              filesStore.set(JSON.parse(data.files))
+              filesArrivedStore.set(true)
+              break;
+            case 'RESPONSE_FILE_URI':
+              fileUriBase64Store.set(data.file)
+              fileUriArrivedStore.set(true)
+
               break;
             case 'ERROR':
               childStore.errors = [...childStore.errors, data.message];
@@ -105,7 +132,7 @@ function createWebSocketStore() {
             case 'CONFIRM_PIN':
             case 'CONFIRM_BAD_WORDS':
             case 'CONFIRM_LOCK_PHONE':
-            case 'RESPONSE_BLOCK_CHAT':
+            
             case 'ADD_SCHEDULE':
             case 'DELETE_SCHEDULE':
               childStore.messages = [...childStore.messages, data];
@@ -217,20 +244,23 @@ function createWebSocketStore() {
     sendMessage(childId, { type: 'REQUEST_CONTACT' });
   }
 
-  function responseContact(childId, contacts) {
-    sendMessage(childId, { type: 'RESPONSE_CONTACT', contacts });
+
+  function requestFiles(childId) {
+    sendMessage(childId, { type: 'REQUEST_FILES' });
+  }
+
+  function requestFileUri(childId, uri) {
+    sendMessage(childId, { type: 'REQUEST_FILE_URI' , "uri": uri});
   }
 
   function requestCurrentChats(childId) {
     sendMessage(childId, { type: 'REQUEST_CURRENT_CHATS' });
   }
 
-  function responseCurrentChats(childId, contacts) {
-    sendMessage(childId, { type: 'RESPONSE_CURRENT_CHATS', contacts });
-  }
 
-  function requestBlockChat(childId, name) {
-    sendMessage(childId, { type: 'REQUEST_BLOCK_CHAT', name });
+
+  function requestBlockChat(childId, name, pos) {
+    sendMessage(childId, { type: 'REQUEST_BLOCK_CHAT', name , pos});
   }
 
   function responseBlockChat(childId) {
@@ -263,6 +293,8 @@ function createWebSocketStore() {
 
   return {
     subscribe,
+    requestFiles,
+    requestFileUri,
     initializeWebSockets,
     changePin,
     confirmPin,
@@ -277,9 +309,7 @@ function createWebSocketStore() {
     addSchedule,
     deleteSchedule,
     requestContact,
-    responseContact,
     requestCurrentChats,
-    responseCurrentChats,
     requestBlockChat,
     responseBlockChat,
     requestChat,

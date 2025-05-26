@@ -43,21 +43,6 @@
         setTimeout(() => (errorMessage = ''), duration);
     }
 
-    // Simulate an action (e.g., adding a contact or refreshing the list)
-    async function handleAction() {
-        if (!childId) {
-            handleError('Aucun enfant sélectionné. Veuillez choisir un profil.');
-            return;
-        }
-        try {
-            isLoading = true;
-            errorMessage = '';
-            await websocketStore.requestContact(childId);
-        } catch (error) {
-            handleError(`Erreur lors de la récupération des contacts: ${error.message || 'Erreur inconnue'}`);
-        }
-    }
-
     // Initialize component
     onMount(async () => {
         childId = localStorage.getItem('ActiveChild');
@@ -65,13 +50,9 @@
             handleError('Aucun enfant sélectionné. Veuillez choisir un profil.');
             return;
         }
-
+        isLoading = true;
         try {
-            isLoading = true;
             await websocketStore.requestContact(childId);
-            if (!Array.isArray($contactsStore) || $contactsStore.length === 0) {
-                handleError('Aucun contact trouvé.');
-            }
         } catch (error) {
             handleError(`Erreur lors de l'initialisation des contacts: ${error.message || 'Erreur inconnue'}`);
         }
@@ -79,14 +60,15 @@
 
     // Cleanup on component destroy
     onDestroy(() => {
+        isLoading = false;
         contactsArrivedStore.set(false);
     });
 </script>
 
 
 <div class="card">
-    <div class="card-header">
-        <div class="card-header-title">
+     <div class="card-header-tab card-header">
+        <div class="card-header-title font-size-lg text-capitalize fw-normal ">
             <i class="header-icon lnr-users icon-gradient bg-amy-crisp"></i> Contacts
         </div>
     </div>
@@ -102,6 +84,7 @@
             <div class="spinner"></div>
             Chargement en contacts...
           </div>
+        
         {:else}
             <div class="contact-list" role="region" aria-label="Liste des contacts">
                 {#if Object.keys(groupedContacts).length > 0}
@@ -127,8 +110,9 @@
                         {/each}
                     {/each}
                 {:else}
-                    <div class="loading-container" role="status">
-                        <div class="loading">Aucun contact disponible</div>
+                <div class="placeholder" role="status" aria-live="polite" style="height: 220px;">
+                    <i class="placeholder-icon lnr-users "></i>
+                    <p>Aucun contact disponible.<br /></p>
                     </div>
                 {/if}
             </div>

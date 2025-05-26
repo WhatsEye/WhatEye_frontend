@@ -104,8 +104,7 @@
         <li class="app-sidebar__heading">Functionalities</li>
         <li><a href="/app/contacts"><i class="metismenu-icon pe-7s-users"></i>Contacts</a></li>
         <li><a href="/app/chats"><i class="metismenu-icon pe-7s-chat"></i>Chats</a></li>
-        <li><a href="/app/calls"><i class="metismenu-icon pe-7s-call"></i>Calls</a></li>
-        <li><a href="/app/photos"><i class="metismenu-icon pe-7s-photo"></i>Photos</a></li>
+        <li><a href="/app/files"><i class="metismenu-icon pe-7s-folder"></i>Dossiers</a></li>
         <li>
           <a href="" aria-expanded="false">
               <i class="metismenu-icon pe-7s-folder"></i>Call Records

@@ -16,7 +16,7 @@
         <p class="{index % 2 === 0 ? 'text-sky-600' : 'text-red-600'} mb-1">
             {parent.username === 'azax' ? 'Père' : 'Mère'}
         </p>
-        <p class="small text-muted mt-1">Member of Family</p>
+        <p class="small text-muted mt-1">Membre de la famille</p>
       </div>
       <div class="flex space-x-3 mt-2">
           <button
