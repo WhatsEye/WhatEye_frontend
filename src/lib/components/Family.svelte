@@ -1,4 +1,5 @@
 <script>
+	import { goto } from '$app/navigation';
   export let family = {};
 </script>
 
@@ -20,7 +21,7 @@
       <div class="flex space-x-3 mt-2">
           <button
             class="flex  items-center bg-gray-200 px-3 py-1 border border-gray-600 rounded-full text-gray-900 text-sm hover:bg-gray-100 transition"
-            on:click={() => onSettings(child)}
+            on:click={() =>{goto("/edit/edit-family")}}
             aria-label="Paramètres"
           >
             <i class="lnr lnr-cog  mr-1 mt-1"></i>

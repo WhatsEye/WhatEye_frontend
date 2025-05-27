@@ -3365,7 +3365,7 @@ textarea.form-control-lg {
 
 .card-body {
   flex: 1 1 auto;
-  padding: 1rem 1rem; }
+  padding: 3rem 1rem; }
 
 .card-title {
   margin-bottom: 0.5rem; }
@@ -16289,7 +16289,7 @@ tr.introjs-showElement > th {
   border-radius: 0.2em;
   /* IE hacks */
   zoom: 1;
-  *display: inline;
+  display: inline;
   margin-top: 10px; }
 
 .introjs-button:hover {

@@ -12,6 +12,7 @@
   let errorMessage = '';
   let showAddForm = false;
   let showDeleteConfirm = false;
+  let lockWhatsApp = false;
   let scheduleToDelete = null;
   let deletedSchedule = null;
   let loadMoreTrigger;
@@ -244,12 +245,20 @@
 </svelte:head>
 
 <div class="mb-3 card">
-  <div class="card-header-tab card-header">
-    <div class="card-header-title font-size-lg text-capitalize fw-normal">
-      <i class="header-icon lnr-calendar-full icon-gradient bg-amy-crisp"></i>
-      Horaires
-    </div>
+ <div class="card-header-tab card-header d-flex align-items-center justify-content-between">
+  <div class="card-header-title font-size-lg text-capitalize fw-normal d-flex align-items-center">
+    <i class="header-icon lnr-calendar-full icon-gradient bg-amy-crisp me-2"></i>
+    Horaires
   </div>
+  <!-- <div class="d-flex align-items-center">
+    <span class="me-3">Activer le verrouillage WhatsApp</span>
+    <label class="switch">
+      <input type="checkbox">
+      <span class="slider"></span>
+    </label>
+  </div> -->
+</div>
+
   <div class="p-0 m-3 card-body d-flex flex-column">
     <div class="description">
       Cette fonctionnalité vous permet de gérer les horaires d'accès pour votre enfant. Définissez des périodes et des jours spécifiques pendant lesquels l'accès est autorisé ou restreint.
@@ -462,3 +471,57 @@
 </div>
 
 
+
+<style>
+  /* Switch container */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+/* Hide default checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Slider background */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+/* Circle inside slider */
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 21px;
+  width: 21px;
+  left: 2px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+/* Checked state */
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+/* Move the circle when checked */
+input:checked + .slider::before {
+  transform: translateX(26px);
+}
+
+</style>

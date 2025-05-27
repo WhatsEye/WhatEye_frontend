@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { contactsArrivedStore, contactsStore, contactsChatStore,errorLocation, newLocation, contactsChatArrivedStore, contactBlockedArrivedStore, filesArrivedStore, filesStore, fileUriArrivedStore, fileUriBase64Store } from './functions';
+import { contactsArrivedStore, contactsStore, contactsChatStore,errorLocation, newLocation, contactsChatArrivedStore, contactBlockedArrivedStore, filesArrivedStore, filesStore, fileUriArrivedStore, fileUriBase64Store, pinChangedStore } from './functions';
 
 
 const connectedId = writable([])
@@ -124,12 +124,14 @@ function createWebSocketStore() {
             case 'RESPONSE_FILE_URI':
               fileUriBase64Store.set(data.file)
               fileUriArrivedStore.set(true)
-
+              break;
+            case 'CONFIRM_PIN':
+              pinChangedStore.set(true)
               break;
             case 'ERROR':
               childStore.errors = [...childStore.errors, data.message];
               break;
-            case 'CONFIRM_PIN':
+            
             case 'CONFIRM_BAD_WORDS':
             case 'CONFIRM_LOCK_PHONE':
             

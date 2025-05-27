@@ -6,7 +6,10 @@
     localStorage.setItem("ActiveChild", child.id);
     goto("app/dashboard");
   };
-  export let onSettings = (child) => {};
+  export let onSettings = (child) => {
+    localStorage.setItem("ActiveChild", child.id);
+     goto("/edit/edit-child");
+  };
 
   const getColorClass = (index, type) => {
     const colorMap = {

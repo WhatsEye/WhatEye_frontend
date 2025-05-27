@@ -1,4 +1,5 @@
 <script>
+	import { familyStore } from './../../stores/functions.js';
 	import { profileId, setLogedIn } from './../../stores/accounts/auth.js';
 	import { beforeUpdate, onMount } from 'svelte';
 	import Parent from '$lib/components/Parent.svelte';
@@ -45,6 +46,7 @@
 				about: data.about,
 				qr_image: data.qr_image
 			};
+			familyStore.set(family)
 			familyQr = data.qr_image;
 
 			// Extract and format parent data

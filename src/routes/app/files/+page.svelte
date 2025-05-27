@@ -8,6 +8,7 @@
   let errorMessage = '';
   let isLoading = false;
   let isDownload = false;
+  let showNote = false;
   let selectedType = 'ALL';
   let filteredFiles = [];
   let downloadFileName = ''; // <-- stores file name for download
@@ -21,6 +22,8 @@
     filterFiles(selectedType);
     isLoading = false
     filesArrivedStore.set(false);
+    showNote = true
+    setTimeout(()=>{showNote=false}, 10000)
   }
 
   // When file URI and Base64 arrives, decode and download
@@ -98,6 +101,7 @@
 
   // Initialization
   onMount(() => {
+    
     childId = localStorage.getItem('ActiveChild');
     if (!childId) {
       handleError('Aucun enfant sélectionné. Veuillez choisir un profil.');
@@ -124,9 +128,10 @@
       Dossiers
     </div>
   </div>
-
+   
   <!-- Tab Selector -->
   <div class="tabs">
+    
     <button class:active={selectedType === 'ALL'} on:click={() => filterFiles('ALL')}>
       <i class="lnr lnr-menu"></i> Tous
     </button>
@@ -151,6 +156,11 @@
         {/if}
     <!-- File List or Placeholder -->
     <div class="file-list">
+      {#if showNote}
+      <div class="description">
+      Pour des raisons de performance, notre service permet uniquement le téléchargement de fichiers dont la taille est inférieure à 10 Mo.
+      </div>
+      {/if}
       {#if isDownload}    
             <div class="loading" role="status" aria-live="polite">
             <div class="spinner"></div>
@@ -197,12 +207,12 @@
               {formatFileSize(file.size)} | {formatDate(file.lastModified)}
             </span>
           </div>
+          {#if file.size<=10*1024*1024}
           <button disabled={isDownload}  class="download-btn" on:click={() => downloadFile(file.uri, file.name)}>
-         
             <i class="lnr lnr-arrow-down"></i> 
-           
            Télécharger
           </button>
+          {/if}
         </div>
       {/each}
     {/if}

@@ -1,5 +1,11 @@
 <script>
+  import { goto } from "$app/navigation";
+  import { profileId } from "../../stores/accounts/auth";
+
   export let parents = [];
+   export let onSettings = () => {
+     goto("/edit/edit-parent");
+  };
 </script>
 
 {#each parents as parent, index}
@@ -18,16 +24,20 @@
         </p>
         <p class="small text-muted mt-1">Membre de la famille</p>
       </div>
+      {#if $profileId==parent.id}
+        
+      
       <div class="flex space-x-3 mt-2">
           <button
             class="flex  items-center bg-gray-200 px-3 py-1 border border-gray-600 rounded-full text-gray-900 text-sm hover:bg-gray-100 transition"
-            on:click={() => onSettings(child)}
+            on:click={() => onSettings()}
             aria-label="Paramètres"
           >
             <i class="lnr lnr-cog  mr-1 mt-1"></i>
             Paramètres
           </button>
         </div>
+        {/if}
     </div>
   </div>
 {/each}
