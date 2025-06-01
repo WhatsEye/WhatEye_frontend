@@ -35,8 +35,8 @@
 <div class="mb-3 card">
   <div class="card-header-tab card-header">
     <div class="card-header-title font-size-lg text-capitalize fw-normal">
-      <i class="header-icon lnr-clock icon-gradient bg-happy-itmeo"></i>
-      Screen time
+      <i class="header-icon metismenu-icon pe-7s-timer icon-gradient bg-happy-itmeo"></i>
+      Temps d'écran WhatsApp
     </div>
   </div>
   <div class="p-0 card-body">
@@ -95,7 +95,18 @@
   <div class="p-3 card-footer">
     <div class="widget-chart-flex d-flex justify-content-between align-items-center">
       <span class="widget-numbers fw-bold opacity-5">Temps d'écran quotidien</span>
-      <span class="widget-numbers fw-bold opacity-8">{totalTimeText}</span>
+      <span class="widget-numbers fw-bold opacity-8 ml-5"> {totalTimeText}</span>
     </div>
+    
   </div>
+  <div class="text-center d-block p-3 card-footer">
+            <a href="/app/appusage">
+                <button class="btn-pill btn-shadow btn-wide fsize-1 btn btn-primary btn-lg">
+                    <span class="me-2 opacity-7">
+                        <i class="metismenu-icon pe-7s-timer"></i>
+                    </span>
+                    <span class="me-1">Voir l'utilisation</span>
+                </button>
+            </a>
+        </div>
 </div>

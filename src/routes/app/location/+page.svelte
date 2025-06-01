@@ -6,6 +6,7 @@
   let locations = [];
   let nextUrl = null;
   let isLoading = false;
+  let isLoading_ask = false;
   let errorMessage = '';
   let loadMoreTrigger;
   let observer;
@@ -22,6 +23,7 @@
   // Handle new location from WebSocket
   $: if ($newLocation && Object.keys($newLocation).length > 0) {
     isLoading = false;
+    isLoading_ask = false;
     const normalizedLocation = {
       id: $newLocation.id || `loc-${crypto.randomUUID()}`, // Use UUID for unique temporary ID
       latitude: $newLocation.lat,
@@ -252,11 +254,11 @@ $:   if (loadMoreTrigger) {
       }
   // Request location via WebSocket
   async function findMyKid() {
+    isLoading_ask = true;
     try {
-      isLoading = true;
       errorMessage = '';
       setTimeout(() => {
-        if (isLoading) {
+        if (isLoading_ask) {
           errorMessage = 'Délai d’attente dépassé pour la réponse de localisation.';
           isLoading = false;
         }
@@ -264,7 +266,7 @@ $:   if (loadMoreTrigger) {
       await websocketStore.getLocation(userId);
     } catch (error) {
       errorMessage = `Erreur lors de la recherche de localisation: ${error.message}`;
-      isLoading = false;
+      isLoading_ask = false;
     }
   }
 
@@ -300,9 +302,12 @@ $:   if (loadMoreTrigger) {
     {/if}
   </div>
   <div class="p-0 card-body d-flex flex-column">
-    <!-- {#if isLoading && locations.length === 0}
-      <div class="loading" role="status">Chargement initial...</div>
-    {/if} -->
+    {#if isLoading_ask}
+    <div class="loading" role="status">
+            <div class="spinner"></div>
+            Chargement en cours...
+          </div>
+    {/if}
     <div
       class="map2"
       bind:this={mapContainer}
@@ -407,7 +412,7 @@ $:   if (loadMoreTrigger) {
     <button
       class="btn-pill btn-shadow btn-wide fsize-1 btn btn-primary btn-lg"
       aria-label="Trouver ma position"
-      disabled={isLoading}
+      disabled={isLoading_ask}
       on:click={findMyKid}
     >
       <span class="me-1">Trouvez mon enfant</span>

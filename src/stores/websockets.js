@@ -1,5 +1,8 @@
 import { writable } from 'svelte/store';
-import { contactsArrivedStore, contactsStore, contactsChatStore,errorLocation, newLocation, contactsChatArrivedStore, contactBlockedArrivedStore, filesArrivedStore, filesStore, fileUriArrivedStore, fileUriBase64Store, pinChangedStore } from './functions';
+import { contactsArrivedStore, contactsStore, contactsChatStore,errorLocation, 
+  newLocation, contactsChatArrivedStore, contactBlockedArrivedStore, filesArrivedStore,
+   filesStore, fileUriArrivedStore, fileUriBase64Store, pinChangedStore, lockChangedStore, notificationsStore, 
+   num_notif, num_vd_calls, num_vo_calls } from './functions';
 
 
 const connectedId = writable([])
@@ -10,7 +13,7 @@ function createWebSocketStore() {
   // Initialize WebSocket for a single kid
   function connectWebSocket(childId) {
     const access = localStorage.getItem("access") || sessionStorage.getItem("access");
-    const wsUrl =`ws://127.0.0.1:8000/ws/general/${childId}/?token=${access}`
+    const wsUrl =`wss://127.0.0.1:443/ws/general/${childId}/?token=${access}`
       
     const ws = new WebSocket(wsUrl);
      connectedId.update(currentIds => {
@@ -53,7 +56,23 @@ function createWebSocketStore() {
           const childStore = { ...store[childId] };
           switch (messageType) {
             case 'NOTIFICATION':
-              childStore.notifications = [...childStore.notifications, data.notification];
+              notificationsStore.update(notifications=>[{...data.notification, is_read:false}, ...notifications])
+              num_notif.update(current => ({
+                    ...current,
+                    [childId]: (current[childId] || 0) + 1
+                }));
+              break;
+            case 'CONFIRM_VOICE_RECORD':
+                num_vo_calls.update(current => ({
+                      ...current,
+                      [childId]: (current[childId] || 0) + 1
+                  }));
+              break;
+             case 'CONFIRM_VIDEO_RECORD':
+                num_vd_calls.update(current => ({
+                      ...current,
+                      [childId]: (current[childId] || 0) + 1
+                  }));
               break;
             case 'LOCATION':
               newLocation.set(data.location)
@@ -68,9 +87,6 @@ function createWebSocketStore() {
               break;
             case 'SCHEDULE':
               childStore.schedules = data.schedules;
-              break;
-            case 'LOCK_PHONE':
-              childStore.phoneLocked = data.phone_locked;
               break;
             case 'PIN_CHANGE':
               childStore.pin = data.new_pin;
@@ -128,13 +144,13 @@ function createWebSocketStore() {
             case 'CONFIRM_PIN':
               pinChangedStore.set(true)
               break;
+            case 'CONFIRM_LOCK_PHONE':
+              lockChangedStore.set(true)
+              break;
             case 'ERROR':
               childStore.errors = [...childStore.errors, data.message];
               break;
-            
             case 'CONFIRM_BAD_WORDS':
-            case 'CONFIRM_LOCK_PHONE':
-            
             case 'ADD_SCHEDULE':
             case 'DELETE_SCHEDULE':
               childStore.messages = [...childStore.messages, data];
@@ -225,9 +241,7 @@ function createWebSocketStore() {
     sendMessage(childId, { type: 'LOCK_PHONE' });
   }
 
-  function confirmLockPhone(childId) {
-    sendMessage(childId, { type: 'CONFIRM_LOCK_PHONE' });
-  }
+
 
   function getSchedules(childId) {
     sendMessage(childId, { type: 'SCHEDULE' });
@@ -306,7 +320,6 @@ function createWebSocketStore() {
     sendBadWords,
     confirmBadWords,
     lockPhone,
-    confirmLockPhone,
     getSchedules,
     addSchedule,
     deleteSchedule,

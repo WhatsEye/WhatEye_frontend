@@ -17,6 +17,7 @@
 	let inviteSuccess = false;
 	let parentQr = ''; // Parent QR for child login
 	let familyQr = ''; // Family QR for child registration
+	let isLoading = false;
 
 	let family = {};
 	let parents = [];
@@ -27,6 +28,7 @@
 	onMount(async () => {
 		forceLogin();
 		setLogedIn();
+		isLoading = true;
 		localStorage.removeItem("ActiveChild");
 		let access = localStorage.getItem("access") || sessionStorage.getItem("access");
 		const config = {
@@ -39,6 +41,9 @@
 		try {
 			const res = await fetch(`${baseurl}/accounts/profile/family/`, config);
 			const data = await res.json();
+			if (res.ok){
+				isLoading = false;
+			}
 			family = {
 				id: data.id,
 				photo: data.photo,
@@ -70,7 +75,11 @@
 				photo: k.photo,
 				username: k.username,
 				full_name: k.full_name,
-				gender: k.gender
+				gender: k.gender,
+				phone_locked : k.phone_locked ,
+				num_unread_notifications: k.num_unread_notifications,
+				num_unread_voice_calls: k.num_unread_voice_calls,
+				num_unread_video_calls: k.num_unread_video_calls
 			}));
 			childIds = data.kids.map(kid => kid.id);
 			websocketStore.initializeWebSockets(childIds);
@@ -132,9 +141,16 @@
 <svelte:head>
 	<title>Famille</title>
   <link rel="stylesheet" href="/styles/dashboard.css" />
-	<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</svelte:head>
+  <link rel="stylesheet" href="/styles/tailwind.min.css" />
+  </svelte:head>
+
 <div class="tabs-animation md:mx-32 app-container app-theme-white body-tabs-shadow py-4">
+	 {#if isLoading}    
+            <div class="loading" role="status" aria-live="polite">
+            <div class="spinner"></div>
+            Chargement ...
+          </div>
+		  {:else}
 	<div class="container mx-auto app-container">
 		<div class="tabs-animation app-container">
 			<Family {family} />
@@ -272,6 +288,7 @@
 			{/if}
 		</div>
 	</div>
+	{/if}
 </div>
 
 <style>

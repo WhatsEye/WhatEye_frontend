@@ -1,7 +1,9 @@
 <script>
+
+  import { num_notif, num_vo_calls, num_vd_calls, allowDash } from './../../stores/functions.js';
   import { onMount } from 'svelte';
   import { afterNavigate } from '$app/navigation';
-
+  let userId ;
   function updateActiveSidebarLink() {
     const currentPath = window.location.pathname;
     const links = document.querySelectorAll(".vertical-nav-menu a");
@@ -13,6 +15,7 @@
   }
 
   onMount(() => {
+    userId = localStorage.getItem('ActiveChild');
     updateActiveSidebarLink();       
     
     const buttons = document.querySelectorAll(".close-sidebar-btn");
@@ -58,6 +61,7 @@
   });
 </script>
 <svelte:head>
+  	<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/styles/pe7-icon/dist/dist/pe-icon-7-stroke.css">
 </svelte:head>
 <div class="app-sidebar sidebar-shadow">
@@ -98,9 +102,16 @@
     <div class="app-sidebar__inner">
       <ul class="vertical-nav-menu">
         <li class="app-sidebar__heading">DashBoard</li>
-        <li><a href="/family"><i class="metismenu-icon pe-7s-users"></i>My Family</a></li>
+        <li><a href="/family" onclick="{()=>{allowDash.set(false)}}"><i class="metismenu-icon pe-7s-users"></i>My Family</a></li>
         <li><a href="/app/dashboard"><i class="metismenu-icon pe-7s-graph2"></i>DashBoard</a></li>
-        <li><a href="/app/notifications"><i class="metismenu-icon pe-7s-bell"></i>Notifications</a></li>
+        <li><a href="/app/notifications"><i class="metismenu-icon pe-7s-bell"></i>Notifications  
+          {#if ($num_notif[userId] || 0)>0}
+          <span style="background: red;" class="absolute top-2.5 right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center"> 
+               {($num_notif[userId] || 0)>=100 ? "+99" : ($num_notif[userId] || 0) }</span>
+               {/if}
+            </a>  
+         
+            </li>
         <li class="app-sidebar__heading">Functionalities</li>
         <li><a href="/app/contacts"><i class="metismenu-icon pe-7s-users"></i>Contacts</a></li>
         <li><a href="/app/chats"><i class="metismenu-icon pe-7s-chat"></i>Chats</a></li>
@@ -111,8 +122,20 @@
               <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
           </a>
           <ul>
-              <li><a href="/app/videos"><i class="metismenu-icon pe-7s-video"></i>Videos</a></li>
-              <li><a href="/app/voices"><i class="metismenu-icon pe-7s-micro"></i>Voices</a></li>
+              <li><a href="/app/videos"><i class="metismenu-icon pe-7s-video"></i>Videos
+                {#if  ($num_vd_calls[userId] || 0)>0}
+                  <span style="background: red;" class="absolute top-2.5 right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center"> 
+               { ($num_vd_calls[userId] || 0)>100 ? "+99" : ($num_vd_calls[userId] || 0) }</span>
+                {/if}
+              
+              
+              </a></li>
+              <li><a href="/app/voices"><i class="metismenu-icon pe-7s-micro"></i>Voices
+                 {#if ($num_vo_calls[userId] || 0)>0}
+              <span style="background: red;" class="absolute top-2.5 right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center"> 
+               {($num_vo_calls[userId] || 0)>=100 ? "+99" : ($num_vo_calls[userId] || 0) }</span>
+               {/if}
+              </a></li>
           </ul>
       </li>
         <li><a href="/app/schedules"><i class="metismenu-icon lnr-calendar-full"></i>Délais Horaires</a></li>

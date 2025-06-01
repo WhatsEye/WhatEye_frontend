@@ -1,7 +1,14 @@
 <script>
+	import { onMount } from 'svelte';
+	import { checkPath } from './../../stores/functions.js';
   import Header from '$lib/components/Header.svelte';
   import Navbar from '$lib/components/Navbar.svelte';
   import Footer from '$lib/components/Footer.svelte';
+  
+  onMount(()=>{
+    checkPath()
+  })
+
 </script>
 
 

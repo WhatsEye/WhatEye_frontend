@@ -1,4 +1,5 @@
 <script>
+	import { num_vo_calls } from './../../../stores/functions.js';
   import { onMount, onDestroy } from 'svelte';
   import { browser } from '$app/environment'; // Import browser check
   import { baseurl } from '../../../stores/functions';
@@ -179,6 +180,8 @@
       records = records.map((rec) =>
         rec.id === audio.id ? { ...rec, is_read: true } : rec
       );
+      num_vo_calls.update(num=>num-1)
+
     } catch (error) {
       errorMessage = `Erreur lors du marquage de l'audio comme écouté: ${error.message}`;
       setTimeout(() => (errorMessage = ''), 3000);

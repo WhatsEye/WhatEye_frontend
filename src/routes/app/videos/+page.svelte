@@ -1,4 +1,5 @@
 <script>
+	import { num_vd_calls } from './../../../stores/functions.js';
   import { onMount, onDestroy } from 'svelte';
   import { baseurl } from '../../../stores/functions';
 
@@ -171,6 +172,7 @@
       records = records.map((rec) =>
         rec.id === video.id ? { ...rec, is_read: true } : rec
       );
+      num_vd_calls.update(num=>num-1)
     } catch (error) {
       errorMessage = `Erreur lors du marquage de la vidéo comme vue: ${error.message}`;
       setTimeout(() => (errorMessage = ''), 3000);

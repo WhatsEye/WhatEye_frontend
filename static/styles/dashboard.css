@@ -329,15 +329,17 @@ select {
       width: 100%;
       animation: slideIn 0.3s ease;
     }
-    .confirm-dialog h3 {
-      margin: 0 0 16px;
-      font-size: 1.2em;
-      color: #333;
-    }
-    .confirm-dialog p {
-      margin: 0 0 16px;
-      color: #555;
-    }
+     .confirm-dialog h3 {
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: #1f2937;
+        margin-bottom: 1rem;
+      }
+
+      .confirm-dialog p {
+        color: #4b5563;
+        margin-bottom: 1.5rem;
+      }
     .confirm-dialog .buttons {
       display: flex;
       justify-content: flex-end;
@@ -1025,6 +1027,12 @@ select {
     flex-direction: column;
     align-items: center;
     gap: 1rem;
+  }
+  .card-header-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #1f2937;
+    text-transform: capitalize;
   }
 
   .family-img {

@@ -6,13 +6,13 @@
   let mapContainer;
   let map;
   let currentMarker = null;
-  let isLoading = false;
+  $: isLoading = false;
   let errorMessage = '';
   let userId;
 
-  const defaultLat = 36.6;
-  const defaultLong = 3.0;
-  const defaultZoom = 10; // Adjusted to a reasonable street-level zoom
+  const defaultLat = 36.75;
+  const defaultLong = 3.1;
+  const defaultZoom = 13; // Adjusted to a reasonable street-level zoom
 
   // Handle new location from WebSocket
   $: if ($newLocation && Object.keys($newLocation).length > 0) {
@@ -33,7 +33,6 @@
 
   // Handle location errors
   $: if ($errorLocation) {
-    isLoading = false;
     if ($errorLocation === 'GPS_OFF') {
       errorMessage = 'Le GPS est désactivé. Veuillez l\'activer pour continuer.';
     } else if ($errorLocation === 'NO_PERMISSION') {
@@ -84,15 +83,15 @@
       handleError('Aucun enfant sélectionné. Veuillez choisir un profil.');
       return;
     }
-
+    isLoading = true;
     try {
-      isLoading = true;
+      
       errorMessage = '';
       setTimeout(() => {
         if (isLoading) {
           handleError('Délai d’attente dépassé pour la réponse de localisation.');
         }
-      }, 15000);
+      }, 20000);
       await websocketStore.getLocation(userId);
     } catch (error) {
       handleError(`Erreur lors de la recherche de localisation: ${error.message}`);
@@ -180,6 +179,12 @@
         {errorMessage}
       </div>
     {/if}
+     {#if isLoading}
+    <div class="loading" role="status">
+            <div class="spinner"></div>
+            Chargement en cours...
+          </div>
+    {/if}
     <div
       class="map"
       bind:this={mapContainer}
@@ -194,6 +199,7 @@
       disabled={isLoading}
       on:click={findMyKid}
     >
+       <i class="pe-7s-map"></i>
       <span class="me-1">Trouvez mon enfant</span>
     </button>
   </div>
