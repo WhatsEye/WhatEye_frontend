@@ -2,7 +2,9 @@ import { writable } from 'svelte/store';
 import { contactsArrivedStore, contactsStore, contactsChatStore,errorLocation, 
   newLocation, contactsChatArrivedStore, contactBlockedArrivedStore, filesArrivedStore,
    filesStore, fileUriArrivedStore, fileUriBase64Store, pinChangedStore, lockChangedStore, notificationsStore, 
-   num_notif, num_vd_calls, num_vo_calls } from './functions';
+   num_notif, num_vd_calls, num_vo_calls, 
+   chatRoomContent,
+   chatRoomContentArrived} from './functions';
 
 
 const connectedId = writable([])
@@ -127,8 +129,20 @@ function createWebSocketStore() {
                 }
                 break;
             case 'RESPONSE_CHAT':
-              childStore.chats = [...childStore.chats, ...data.chats];
-              break;
+              try {
+                    // Validate data.contacts exists
+                    if (!data.chats || typeof data.chats !== 'string') {
+                        console.error('Invalid or missing Chat data');
+                        return;
+                    }
+                    let parsedContactsChat = JSON.parse(data.chats);
+                    parsedContactsChat= JSON.parse(new Array(parsedContactsChat)[0])
+                    chatRoomContent.set(parsedContactsChat);
+                    chatRoomContentArrived.set(true)
+                } catch (error) {
+                    console.error('Error processing chats:', error.message);
+                }
+            break;
             
             case 'RESPONSE_BLOCK_CHAT':
               contactBlockedArrivedStore.set(true)
@@ -283,13 +297,10 @@ function createWebSocketStore() {
     sendMessage(childId, { type: 'RESPONSE_BLOCK_CHAT' });
   }
 
-  function requestChat(childId, name) {
-    sendMessage(childId, { type: 'REQUEST_CHAT', name });
+  function requestChat(childId, name, pos) {
+    sendMessage(childId, { type: 'REQUEST_CHAT', name , pos});
   }
 
-  function responseChat(childId, chats) {
-    sendMessage(childId, { type: 'RESPONSE_CHAT', chats });
-  }
 
   function requestSelect(childId, name) {
     sendMessage(childId, { type: 'REQUEST_SELECT', name });
@@ -328,7 +339,6 @@ function createWebSocketStore() {
     requestBlockChat,
     responseBlockChat,
     requestChat,
-    responseChat,
     requestSelect,
     closeAll
   };

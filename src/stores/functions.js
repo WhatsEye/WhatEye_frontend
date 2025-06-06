@@ -21,6 +21,9 @@ export const lockChangedStore = writable(false);
 export const num_notif = writable({});
 export const num_vo_calls = writable({});
 export const num_vd_calls = writable({});
+export const activChatRoom = writable({});
+export const chatRoomContent = writable([]);
+export const chatRoomContentArrived = writable(false);
 
 
 export const locationsStore = writable([]);

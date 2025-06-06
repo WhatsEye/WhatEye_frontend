@@ -176,6 +176,11 @@
       });
 
       if (res.ok) {
+         num_notif.update(current => ({
+          ...current,
+          [childId]: (current[childId] || 0) - 1
+        }));
+        
         notificationsStore.update((notifs) => notifs.filter((n) => n.id !== notificationToDelete.id));
         errorMessage = 'Notification supprimée avec succès.';
         setTimeout(() => (errorMessage = ''), 3000);
@@ -439,6 +444,7 @@
 
   .notification-content {
     flex: 1;
+    overflow: hidden;
   }
 
   .notification-title {
@@ -452,6 +458,8 @@
     color: #4b5563;
     margin: 0.25rem 0;
     white-space: pre-wrap;
+        text-overflow: ellipsis;
+
   }
 
   .notification-meta {

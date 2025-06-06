@@ -1,8 +1,8 @@
 <script>
-	import { contactsChatStore, contactsChatArrivedStore } from './../../../stores/functions.js';
+	import { contactsChatStore, contactsChatArrivedStore, activChatRoom } from './../../../stores/functions.js';
 	import { onMount } from 'svelte';
     import RecentChat from '$lib/components/RecentChat.svelte';
-    //import ChatCard from '$lib/components/ChatCard.svelte';
+    import ChatCard from '$lib/components/ChatCard.svelte';
     import { websocketStore } from '../../../stores/websockets';
 
     let childId;
@@ -57,6 +57,7 @@
     }  
       
     onMount(async () => {
+        activChatRoom.set({})
         childId = localStorage.getItem('ActiveChild');
         if (!childId) {
             handleError('Aucun enfant sélectionné. Veuillez choisir un profil.');
@@ -97,7 +98,9 @@
 <div class="app-inner-layout chat-layout mb-4 contact_room" class:open-mobile-menu={isMobileMenuOpen}>
     <div class="app-inner-layout__wrapper">
         <div class="app-inner-layout__content card"  class:d-none={hamburgerActive}>
-            <!-- <ChatCard on:toggleAppMenu={handleToggleAppMenu}></ChatCard> -->
+            {#if $activChatRoom.name}
+            <ChatCard on:toggleAppMenu={handleToggleAppMenu}></ChatCard>
+            {/if}
         </div>
         <div class="app-inner-layout__sidebar card overflow-hidden " style="z-index: 5;">
         

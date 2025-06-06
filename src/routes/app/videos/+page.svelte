@@ -1,5 +1,5 @@
 <script>
-	import { num_vd_calls } from './../../../stores/functions.js';
+  import { num_vd_calls } from './../../../stores/functions.js';
   import { onMount, onDestroy } from 'svelte';
   import { baseurl } from '../../../stores/functions';
 
@@ -63,7 +63,8 @@
       const newRecords = json.results.filter(
         (record) => record.id && record.record_file && record.date && record.recording_type === 'video'
       );
-      records = [...records, ...newRecords];
+      // Append new records and sort by date (newest first)
+      records = [...records, ...newRecords].sort((a, b) => new Date(b.date) - new Date(a.date));
       nextUrl = json.next;
     } catch (error) {
       errorMessage = `Erreur lors de la récupération des vidéos: ${error.message}`;
@@ -98,7 +99,7 @@
     }
 
     try {
-      const res = await fetch(`${baseurl}/control/records/${userId}/update/${videoIdToDelete}/`, {
+      const res = await fetch(`${baseurl}/control/records/${userId}/update/${videoIdToDelete.id}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -122,10 +123,15 @@
         setTimeout(() => {
           done_deletion = false;
         }, 5000);
+        if(!videoIdToDelete.is_read){
+            num_vd_calls.update((current) => ({
+            ...current,
+            [userId]: (current[userId] || 0) - 1,
+          }));}
       }
 
       // Remove the deleted video from records
-      records = records.filter((record) => record.id !== videoIdToDelete);
+      records = records.filter((record) => record.id !== videoIdToDelete.id);
       errorMessage = 'Vidéo supprimée avec succès.';
     } catch (error) {
       errorMessage = `Erreur lors de la suppression de la vidéo: ${error.message}`;
@@ -172,12 +178,16 @@
       records = records.map((rec) =>
         rec.id === video.id ? { ...rec, is_read: true } : rec
       );
-      num_vd_calls.update(num=>num-1)
+      num_vd_calls.update((current) => ({
+        ...current,
+        [userId]: (current[userId] || 0) - 1,
+      }));
     } catch (error) {
       errorMessage = `Erreur lors du marquage de la vidéo comme vue: ${error.message}`;
       setTimeout(() => (errorMessage = ''), 3000);
     }
   }
+
   // Close video popup
   function closeVideo() {
     selectedVideo = null;
@@ -209,9 +219,6 @@
       errorMessage = `Erreur lors de l'initialisation: ${error.message}`;
     }
   });
-
-  // Helper function to format video duration
-
 
   // Lifecycle: Cleanup on destroy
   onDestroy(() => {
@@ -256,7 +263,11 @@
           <p>Aucune vidéo disponible pour le moment.</p>
         </div>
       {:else}
-        {#each Object.entries(groupedRecords) as [date, videos]}
+        {#each Object.entries(groupedRecords).sort(([dateA], [dateB]) => {
+          const dateAObj = new Date(dateA.split('/').reverse().join('-')); // Convert 'DD/MM/YYYY' to 'YYYY-MM-DD'
+          const dateBObj = new Date(dateB.split('/').reverse().join('-'));
+          return dateBObj - dateAObj; // Sort newest first
+        }) as [date, videos]}
           <div class="video-group" role="group" aria-label={`Vidéos du ${date}`}>
             <h3 class="date-header">{date}</h3>
             <div class="video-grid">
@@ -276,7 +287,6 @@
                       aria-hidden="true"
                     ></video>
                     <div class="play-icon"><i class="lnr-play-circle"></i></div>
-                  
                   </div>
                   <div class="video-card-info">
                     <span class="video-timestamp">
@@ -294,8 +304,8 @@
                       {/if}
                       <button
                         class="delete-button"
-                        on:click={() => confirmDeleteVideo(video.id, video.timestamp)}
-                        on:keydown={(e) => e.key === 'Enter' && confirmDeleteVideo(video.id, video.timestamp)}
+                        on:click={() => confirmDeleteVideo(video, video.timestamp)}
+                        on:keydown={(e) => e.key === 'Enter' && confirmDeleteVideo(video, video.timestamp)}
                         aria-label={`Supprimer la vidéo du ${new Date(video.timestamp).toLocaleString('fr-FR')}`}
                       >
                         <i class="lnr-trash"></i> Supprimer
@@ -390,4 +400,3 @@
     {/if}
   </div>
 </main>
-

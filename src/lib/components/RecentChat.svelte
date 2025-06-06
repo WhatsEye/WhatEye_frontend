@@ -1,7 +1,10 @@
 <script>
+	import { websocketStore } from './../../stores/websockets.js';
+	import { activChatRoom, chatRoomContentArrived } from './../../stores/functions.js';
     import { createEventDispatcher } from "svelte";
     import { contactBlockedArrivedStore, contactsChatStore } from "../../stores/functions";
-  import { websocketStore } from "../../stores/websockets";
+    import placeholder from "$lib/icons/placeholde.svg";
+
     export let chatData;
     export let isActive = false;
     let childId;
@@ -47,6 +50,14 @@
             handleError(`Erreur lors de l'initialisation des contacts: ${error.message || 'Erreur inconnue'}`);
         }
     }
+    const handleClick =()=>{
+        activChatRoom.set(chatData)
+        childId = localStorage.getItem('ActiveChild');
+        websocketStore.requestChat(childId, chatData.name, chatData.pos)
+        chatRoomContentArrived.set(false)
+        // websocketStore
+        // requestChat
+    }
 </script>
 
 <!-- svelte-ignore a11y_interactive_supports_focus -->
@@ -62,7 +73,7 @@
                             <div class="avatar-icon-wrapper">
                                 <div class="avatar-icon">
                                     <img 
-                                        src={chatData.icon || "https://placehold.co/150x150/EFEFEF/AAAAAA&text=Photo"} 
+                                        src={chatData.icon || placeholder} 
                                         alt="{chatData.name}'s profile photo"
                                     >
                                 </div>

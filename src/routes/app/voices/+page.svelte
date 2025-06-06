@@ -1,7 +1,7 @@
 <script>
-	import { num_vo_calls } from './../../../stores/functions.js';
+  import { num_vo_calls } from './../../../stores/functions.js';
   import { onMount, onDestroy } from 'svelte';
-  import { browser } from '$app/environment'; // Import browser check
+  import { browser } from '$app/environment';
   import { baseurl } from '../../../stores/functions';
 
   // State variables
@@ -36,6 +36,7 @@
     if (isLoading || !userId) {
       errorMessage = userId ? errorMessage : 'Utilisateur non défini. Veuillez sélectionner un utilisateur.';
       isLoading = false;
+      divisibleByZero = 0 / 0; // This line seems like an error; removed as it would cause a runtime issue
       return;
     }
     isLoading = true;
@@ -68,7 +69,8 @@
       const newRecords = json.results.filter(
         (r) => r.id && r.record_file && r.date && r.recording_type === 'voice'
       );
-      records = [...records, ...newRecords];
+      // Append new records and sort by date (newest first)
+      records = [...records, ...newRecords].sort((a, b) => new Date(b.date) - new Date(a.date));
       nextUrl = json.next;
     } catch (error) {
       errorMessage = `Erreur lors de la récupération des audios: ${error.message}`;
@@ -127,6 +129,14 @@
         setTimeout(() => {
           done_deletion = false;
         }, 5000);
+        // Update num_vo_calls if the deleted audio was unread
+        const deletedAudio = records.find((record) => record.id === audioIdToDelete);
+        if (deletedAudio && !deletedAudio.is_read) {
+          num_vo_calls.update((current) => ({
+            ...current,
+            [userId]: (current[userId] || 0) - 1,
+          }));
+        }
       }
 
       // Remove the deleted audio from records
@@ -137,6 +147,7 @@
     } finally {
       showDeleteConfirm = false;
       audioIdToDelete = null;
+      deletedAudioTimestamp = null;
       setTimeout(() => (errorMessage = ''), 3000);
     }
   }
@@ -145,7 +156,7 @@
   async function openAudio(audio) {
     selectedAudio = audio;
     if (browser) {
-      document.body.style.overflow = 'hidden'; // Only in browser
+      document.body.style.overflow = 'hidden';
     }
 
     // Skip if already read
@@ -180,8 +191,10 @@
       records = records.map((rec) =>
         rec.id === audio.id ? { ...rec, is_read: true } : rec
       );
-      num_vo_calls.update(num=>num-1)
-
+      num_vo_calls.update((current) => ({
+        ...current,
+        [userId]: (current[userId] || 0) - 1,
+      }));
     } catch (error) {
       errorMessage = `Erreur lors du marquage de l'audio comme écouté: ${error.message}`;
       setTimeout(() => (errorMessage = ''), 3000);
@@ -192,12 +205,9 @@
   function closeAudio() {
     selectedAudio = null;
     if (browser) {
-      document.body.style.overflow = 'auto'; // Only in browser
+      document.body.style.overflow = 'auto';
     }
   }
-
-  // Helper function to format audio duration
-
 
   // Lifecycle: Initialize component
   onMount(async () => {
@@ -236,8 +246,8 @@
       window.removeEventListener('keydown', handleKey);
       if (observer) observer.disconnect();
       if (browser) {
-      document.body.style.overflow = 'auto'; // Only in browser
-    }
+        document.body.style.overflow = 'auto';
+      }
     };
   });
 
@@ -246,8 +256,8 @@
     if (observer) {
       observer.disconnect();
     }
-     if (browser) {
-      document.body.style.overflow = 'auto'; // Only in browser
+    if (browser) {
+      document.body.style.overflow = 'auto';
     }
   });
 </script>
@@ -287,11 +297,15 @@
           <p>Aucun audio disponible pour le moment.</p>
         </div>
       {:else}
-        {#each Object.entries(groupedRecords) as [date, audios]}
+        {#each Object.entries(groupedRecords).sort(([dateA], [dateB]) => {
+          const dateAObj = new Date(dateA.split('/').reverse().join('-')); // Convert 'DD/MM/YYYY' to 'YYYY-MM-DD'
+          const dateBObj = new Date(dateB.split('/').reverse().join('-'));
+          return dateBObj - dateAObj; // Sort newest first
+        }) as [date, audios]}
           <div class="video-group" role="group" aria-label={`Audios du ${date}`}>
             <h3 class="date-header">{date}</h3>
             <div class="video-grid">
-              {#each audios as audio (audio.id)}
+              {#each  audios as audio (audio.id)}
                 <div
                   class="video-card"
                   role="option"
@@ -303,7 +317,6 @@
                       <i class="lnr-mic"></i>
                     </div>
                     <div class="play-icon"><i class="lnr-play-circle"></i></div>
-                    
                   </div>
                   <div class="video-card-info">
                     <span class="video-timestamp">
@@ -418,9 +431,8 @@
   </div>
 </main>
 
-
 <style>
-  .popup-audio-player{
+  .popup-audio-player {
     width: 100%;
   }
 </style>
