@@ -459,6 +459,12 @@
     margin: 0.25rem 0;
     white-space: pre-wrap;
         text-overflow: ellipsis;
+    
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+
 
   }
 
