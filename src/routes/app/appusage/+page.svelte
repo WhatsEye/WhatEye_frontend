@@ -157,7 +157,7 @@
               </div>
             </div>
           </div>
-          <div class="widget-chart-wrapper opacity-10 m-0">
+          <div class=" opacity-10 m-0">
             <div
               class="bar-wrapper"
               role="progressbar"

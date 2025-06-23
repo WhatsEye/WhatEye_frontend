@@ -12,8 +12,9 @@
     let isLoading = false;
     let activeChatId  = -1;
     let contactList = []
-
+    
     $: {
+        
         const contacts = $contactsChatStore
         const countMap = new Map();
         const updatedContacts = contacts.map((item, index) => {
@@ -31,6 +32,7 @@
         return item;
         });
         contactList = updatedContacts;
+        console.log(contactList)
     }
   
     $: if ($contactsChatArrivedStore && $contactsChatStore) {

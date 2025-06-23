@@ -18,24 +18,17 @@ export let loaded = writable(false);
 
 export const config = { headers: { "Content-Type": "application/json", Authorization: "" } }
 
-export const getProfileShortInfo = async (username) => {
-    let data = {
-        id: null,
-        username: null,
-        photo: null,
-    }
-    await axios(`${baseurl}/accounts/search/user/?search=${username}`, config).then(res => {
-        data = res.data['results'][0];
-    })
-    return data;
-}
+
 
 export const setLogedIn = async () => {
     const access = localStorage.getItem("access")
+    
     const token = jwtDecode(access)
     profileId.set(token['id'])
     // localStorage.setItem("pid", token['pid'])
     config.headers.Authorization = `Bearer ${access}`
+    const refreshToken = localStorage.getItem('refresh');
+    updateToken(refreshToken)
 }
 
 export const clearData = async () => {
@@ -51,8 +44,8 @@ export const setLogedOut = async () => {
 
 export const updateToken = async (refresh) => {
     await axios.post(`${baseurl}/accounts/token/refresh/`, { 'refresh': refresh }).then(res => {
-        localStorage.setItem("access", JSON.stringify(res.data.access))
-        localStorage.setItem("refresh", JSON.stringify(res.data.refresh))
+        localStorage.setItem("access", res.data.access)
+        localStorage.setItem("refresh", res.data.refresh)
         config.headers.Authorization = `Bearer ${res.data.access}`
     }).catch(err => {
         setLogedOut();

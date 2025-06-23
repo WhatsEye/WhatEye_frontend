@@ -8,13 +8,14 @@
   export let isGroup = false;
 
   let messages = $chatRoomContent;
+  console.log(messages);
 
   // Helper to determine if message is sent
   const isSentMessage = (id) => id.startsWith('true');
 
   // Helper to determine message type
   const getMessageType = (message) => {
-    if (message.image) return 'image'; // Check for image first
+    if (message.image) return 'image';
     if (message.files?.length > 0) return 'file';
     if (message.call?.some((text) => text.includes('Voice call') || text.includes('Missed voice call')))
       return 'voice';
@@ -32,6 +33,16 @@
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
+
+  // Parse reactions from label to extract emojis
+  const parseReactions = (reaction) => {
+      const emojiPart = reaction.label.split(' in total')[0].replace('Reactions ', '').replace("reaction ", "");
+      return emojiPart.split(', ').map((emoji) => emoji.trim());
+  };
+  const getImageSrc = (base64String) => {
+    if (!base64String) return '';
+    return `data:image/png;base64,${base64String}`;
+  };
 </script>
 
 <div
@@ -39,81 +50,105 @@
   style="background-image: url('/path/to/whatsapp-background.png');"
 >
   {#each messages as message}
-    <div
-      class="flex {isSentMessage(message.id) ? 'justify-end' : 'justify-start'} mb-3 w-full"
-      role="listitem"
-      aria-label="{isSentMessage(message.id) ? 'Sent message' : 'Received message'}"
-    >
+    {#if message.id === ""}
+      <div class="flex justify-center">
+        <div class="relative text-xs max-w-xs my-1 py-1 px-2 bg-gray-100 rounded-lg shadow-md">
+          {message.content}
+        </div>
+      </div>
+    {:else}
       <div
-        class="flex items-end {isSentMessage(message.id) ? 'flex-row-reverse' : ''} relative max-w-[75%]"
+        class="flex {isSentMessage(message.id) ? 'justify-end' : 'justify-start'} mb-3 w-full"
+        role="listitem"
+        aria-label="{isSentMessage(message.id) ? 'Sent message' : 'Received message'}"
       >
-        {#if isGroup && !isSentMessage(message.id)}
-          <img
-            src={icon || placeholder}
-            alt="{name}'s profile picture"
-            class="w-9 h-9 rounded-full mr-2 object-cover"
-            width="36"
-            height="36"
-          />
-        {/if}
         <div
-          class=" {message.content.length<=100 ? "max-w-[80%]" : "max-w-[70%]" } shadow-sm p-2 relative text-gray-800 {isSentMessage(message.id)
-            ? 'bg-whatsapp-sent rounded-l-lg rounded-br-lg'
-            : 'bg-whatsapp-received rounded-r-lg rounded-bl-lg'}"
+          class="flex items-end {isSentMessage(message.id) ? 'flex-row-reverse' : ''} relative max-w-[75%]"
         >
-          <!-- Chat bubble tail -->
+          {#if isGroup && !isSentMessage(message.id)}
+            <img
+              src={icon || placeholder}
+              alt="{name}'s profile picture"
+              class="w-9 h-9 rounded-full mr-2 object-cover"
+              width="36"
+              height="36"
+            />
+          {/if}
           <div
-            class="{isSentMessage(message.id)
-              ? 'bubble-tail-sent'
-              : 'bubble-tail-received'} absolute top-0 "
-          ></div>
+            class=" shadow-sm p-2 relative text-gray-800 {isSentMessage(message.id)
+              ? 'bg-whatsapp-sent rounded-l-lg rounded-br-lg'
+              : 'bg-whatsapp-received rounded-r-lg rounded-bl-lg'}"
+          >
+            <!-- Chat bubble tail -->
+            <div
+              class="{isSentMessage(message.id)
+                ? 'bubble-tail-sent'
+                : 'bubble-tail-received'} absolute top-0"
+            ></div>
 
-          {#if getMessageType(message) === 'image'}
-            <div class="message-content">
-              <img
-                src={message.image}
-                alt="Chat image"
-                class="max-w-full h-auto rounded-lg"
-              />
-              {#if message.content}
-                <p class="text-sm mt-1">{message.content}</p>
-              {/if}
-            </div>
-          {:else if getMessageType(message) === 'file'}
-            <div class="flex items-center space-x-2">
-              <span class="lnr lnr-file-empty w-5 h-5"></span>
-              <div>
-                {#each message.files as file}
-                  <p class="text-sm font-medium">{file.fileName}</p>
-                  <p class="text-xs opacity-70">{formatFileInfo(file)}</p>
-                {/each}
-              </div>
-            </div>
-          {:else if getMessageType(message) === 'voice' || getMessageType(message) === 'video'}
-            <div class="flex items-center space-x-2">
-              {#if getMessageType(message) === 'voice'}
-                <span class="lnr lnr-phone-handset w-5 h-5"></span>
-              {:else}
-                <span class="lnr lnr-camera-video w-5 h-5"></span>
-              {/if}
-              <div>
-                <p class="text-sm font-medium">{message.call[0]}</p>
-                {#if message.call[1]}
-                  <p class="text-xs opacity-70">{message.call[1]}</p>
+            {#if getMessageType(message) === 'image'}
+              <div class="message-content">
+                <img
+                  src={getImageSrc(message.image)}
+                  alt="Chat image"
+                  class="max-w-full h-auto rounded-lg"
+                />
+                {#if message.content}
+                  <p class="text-sm mt-1">{message.content}</p>
                 {/if}
               </div>
+            {:else if getMessageType(message) === 'file'}
+              <div class="flex items-center space-x-2">
+                <span class="lnr lnr-file-empty w-5 h-5"></span>
+                <div>
+                  {#each message.files as file}
+                    <p class="text-sm font-medium">{file.fileName}</p>
+                    <p class="text-xs opacity-70">{formatFileInfo(file)}</p>
+                  {/each}
+                </div>
+              </div>
+            {:else if getMessageType(message) === 'voice' || getMessageType(message) === 'video'}
+              <div class="flex items-center space-x-2">
+                {#if getMessageType(message) === 'voice'}
+                  <span class="lnr lnr-phone-handset w-5 h-5"></span>
+                {:else}
+                  <span class="lnr lnr-camera-video w-5 h-5"></span>
+                {/if}
+                <div>
+                  <p class="text-sm font-medium">{message.call[0]}</p>
+                  {#if message.call[1]}
+                    <p class="text-xs opacity-70">{message.call[1]}</p>
+                  {/if}
+                </div>
+              </div>
+            {:else}
+              <div class="message-content">
+                <p class="text-sm {message.content.length <= 100 ? 'max-w-96' : 'w-96'}">{message.content}</p>
+              </div>
+            {/if}
+            <div class="flex items-center justify-between mt-1">
+              <span class="text-xs opacity-70 w-20">{#if message.reactions.length==0 || message.timestamp.includes(":") }{message.timestamp} {:else} {message.call[1]} {/if}</span>
+              {#if message.reactions?.length > 0}
+                <div class="flex space-x-1">
+                  {#each message.reactions as reaction}
+                   
+                      <span
+                        class="text-xs bg-gray-200 rounded-full px-1.5 py-0.5"
+                        aria-label="Reaction"
+                      >
+                       {#each parseReactions(reaction) as emoji}
+                        {emoji}
+                        {/each}
+                      </span>
+                    
+                  {/each}
+                </div>
+              {/if}
             </div>
-          {:else}
-            <div class="message-content">
-              <p class="text-sm">{message.content}</p>
-            </div>
-          {/if}
-          <div class="flex items-center mt-1">
-            <span class="text-xs opacity-70 w-20">{message.timestamp}</span>
           </div>
         </div>
       </div>
-    </div>
+    {/if}
   {/each}
 </div>
 
@@ -170,22 +205,19 @@
     color: #34b7f3;
   }
 
-  /* Image message styles */
   .message-content img {
     max-width: 100%;
-    max-height: 300px; /* Limit height to prevent overly large images */
-    object-fit: contain; /* Ensure image scales properly */
+    max-height: 300px;
+    object-fit: contain;
     border-radius: 8px;
   }
 
-  /* File message styles */
   .file-message {
     background-color: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
   }
 
-  /* Call message styles */
   .call-message {
     background-color: #f0fdf4;
     border: 1px solid #dcfce7;
@@ -195,5 +227,9 @@
   .call-message.missed {
     background-color: #fef2f2;
     border: 1px solid #fee2e2;
+  }
+
+  .bg-gray-200 {
+    background-color: #e5e7eb;
   }
 </style>

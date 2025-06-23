@@ -9,7 +9,7 @@
 </script>
 
 {#each parents as parent, index}
-  <div class="mb-3 card p-3 rounded-3">
+  <div class="mb-3 card p-3 card-container">
     <div class="d-flex flex-column flex-sm-row align-items-center">
       <!-- svelte-ignore a11y_img_redundant_alt -->
       <img

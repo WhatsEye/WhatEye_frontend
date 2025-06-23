@@ -33,7 +33,11 @@
       text: ["text-blue-600", "text-pink-600"],
       border: ["border-blue-300", "border-pink-300"],
     };
-    return colorMap[type][index % 2];
+    if( index =="M")
+      return colorMap[type][0];
+    else 
+      return colorMap[type][1];
+
   };
 </script>
 
@@ -145,11 +149,11 @@
           <img
             src={child.photo || "https://via.placeholder.com/128"}
             alt={`Profile photo of ${child.full_name}`}
-            class="img-enfant rounded-full border-4 {getColorClass(index, 'border')} object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+            class="img-enfant rounded-full border-4 {getColorClass(child.gender, 'border')} object-cover w-full h-full transition-transform duration-300 hover:scale-105"
           />
         </div>
         <h4 class="text-lg font-semibold text-gray-800 mb-1">{child.full_name}</h4>
-        <p class="text-sm {getColorClass(index, 'text')} font-medium mb-1">{child.username}</p>
+        <p class="text-sm {getColorClass(child.gender, 'text')} font-medium mb-1">{child.username}</p>
         <p class="text-xs text-gray-500 mb-3">{child.gender === "M" ? "Masculin" : "Féminin"}</p>
 
         <!-- Action buttons -->

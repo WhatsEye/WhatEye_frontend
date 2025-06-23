@@ -13,7 +13,7 @@
     />
     <div class="text-content">
       <h2 class="family-name">{family.name}</h2>
-      <p class="family-about">{family.about}</p>
+    <div class="max-w-screen-md  "> <p class="family-about ">{family.about}</p></div> 
       <p class="family-id">Family ID: {family.id}</p>
     </div>
     <div class="button-group">
@@ -79,8 +79,9 @@
   }
 
   .family-about {
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #0284c7;
+    text-align: center;
     margin: 0.25rem 0;
     line-height: 1.4;
   }
