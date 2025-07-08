@@ -4,7 +4,6 @@
   import { onMount } from 'svelte';
   import { baseurl } from '../../../stores/functions';
 
-  
   let showModal = false;
   let appFeedbackMessage = '';
   let activeTab = 'profile'; // Track active tab: 'profile' or 'password'
@@ -32,16 +31,16 @@
 
   let errors = {};
   onMount(async ()=>{
-		let access = localStorage.getItem("access") || sessionStorage.getItem("access");
-		const config = {
-			method: 'GET',
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${access}`
-			}
-		};
-		try {
-			const res = await fetch(`${baseurl}/accounts/profile/parent/`, config);
+    let access = localStorage.getItem("access") || sessionStorage.getItem("access");
+    const config = {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access}`
+      }
+    };
+    try {
+      const res = await fetch(`${baseurl}/accounts/profile/parent/`, config);
       const data = await res.json();
       name = data.user.last_name;
       fname = data.user.first_name;
@@ -49,10 +48,11 @@
       phone_number = data.phone_number;
       birthday = data.birthday;
       photoPreview = data.photo || 'https://placehold.co/150x150/EFEFEF/AAAAAA&text=Photo';
-    }catch (error) {
-			console.error('Error fetching family data:', error);
-		}
+    } catch (error) {
+      console.error('Error fetching family data:', error);
+    }
   })
+
   function validateField(fieldName) {
     const newErrors = { ...errors };
     switch (fieldName) {
@@ -166,27 +166,28 @@
 
   async function handlePasswordConfirm(event) {
     const password = event.detail.password;
-     let childId = localStorage.getItem("ActiveChild");
+    let childId = localStorage.getItem("ActiveChild");
     const access = localStorage.getItem("access") || sessionStorage.getItem("access");
     try {
-    const response = await fetch(`${baseurl}/accounts/check-password/`, {
-        method: 'POST', // Use PATCH or PUT based on your API
+      const response = await fetch(`${baseurl}/accounts/check-password/`, {
+        method: 'POST',
         body: JSON.stringify({ password }),
         headers: {
           "Content-Type": "application/json",
-        Authorization: `Bearer ${access}`,
-        }});
+          Authorization: `Bearer ${access}`,
+        }
+      });
 
       if (response.ok) {
         const data = await response.json();
         if(data.is_correct){
-            showModal = false;
-            await submitActualFormChanges();
-          } else {
-      appFeedbackMessage = 'Échec de la vérification du mot de passe.';
+          showModal = false;
+          await submitActualFormChanges();
+        } else {
+          appFeedbackMessage = 'Échec de la vérification du mot de passe.';
+        }
       }
-    }
-     } catch (error) {
+    } catch (error) {
       message = 'Erreur réseau. Veuillez réessayer.';
     }
   }
@@ -196,7 +197,6 @@
     const access = localStorage.getItem("access") || sessionStorage.getItem("access");
    
     if (activeTab === 'profile') {
-    
       const formData = new FormData();
       formData.append('user.email', email);
       formData.append('phone_number', phone_number);
@@ -206,65 +206,64 @@
       if (photoFile) {
         formData.append('photo', photoFile);
       }
-       try {
-      const response = await fetch(`${baseurl}/accounts/profile/parent/`, {
-        method: 'PATCH', // Use PATCH or PUT based on your API
-        body: formData,
-        headers: {
-        Authorization: `Bearer ${access}`,
-        }});
+      try {
+        const response = await fetch(`${baseurl}/accounts/profile/parent/`, {
+          method: 'PATCH',
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${access}`,
+          }
+        });
         const data = await response.json();
         if (response.ok) {        
-        name = data.user.last_name;
-        fname = data.user.first_name;
-        email = data.user.email;
-        phone_number = data.phone_number;
-        birthday = data.birthday;
-        photoPreview = data.photo || 'https://placehold.co/150x150/EFEFEF/AAAAAA&text=Photo';
-        appFeedbackMessage = 'Profil mis à jour avec succès!';
-        formMessage = '';
-      }else{
-         message = 'Erreur lors de la mise à jour du profil.';
-        formMessage = 'Veuillez réessayer.';
-      }
-    } catch (error) {
-      message = 'Erreur réseau. Veuillez réessayer.';
-      console.error('Submit error:', error);
-    }
-    } else {
-       const payload = {
-          password,
-          password_confirm
-        };
-      try {
-      const res = await fetch(`${baseurl}/accounts/reset_password/change/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json",Authorization: `Bearer ${access}` },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        if (data.status=200){
-            appFeedbackMessage = 'Profil mis à jour avec succès!';
+          name = data.user.last_name;
+          fname = data.user.first_name;
+          email = data.user.email;
+          phone_number = data.phone_number;
+          birthday = data.birthday;
+          photoPreview = data.photo || 'https://placehold.co/150x150/EFEFEF/AAAAAA&text=Photo';
+          appFeedbackMessage = 'Profil mis à jour avec succès!';
+          formMessage = '';
+        } else {
+          message = 'Erreur lors de la mise à jour du profil.';
+          formMessage = 'Veuillez réessayer.';
         }
-      } else {
-        appFeedbackMessage = "La réinitialisation du mot de passe a échoué.";
+      } catch (error) {
+        message = 'Erreur réseau. Veuillez réessayer.';
+        console.error('Submit error:', error);
       }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      appFeedbackMessage = "Erreur de connexion au serveur.";
-    } finally {
+    } else {
+      const payload = {
+        password,
+        password_confirm
+      };
+      try {
+        const res = await fetch(`${baseurl}/accounts/reset_password/change/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${access}` },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          if (data.status=200){
+            appFeedbackMessage = 'Profil mis à jour avec succès!';
+          }
+        } else {
+          appFeedbackMessage = "La réinitialisation du mot de passe a échoué.";
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        appFeedbackMessage = "Erreur de connexion au serveur.";
+      } finally {
         isLoading = false
-        
-      password = '';
-      password_confirm = '';
+        password = '';
+        password_confirm = '';
+      }
     }
-    }
-  formMessage = '';
-  setTimeout(()=>{appFeedbackMessage=""},3000)
+    formMessage = '';
+    setTimeout(()=>{appFeedbackMessage=""},3000)
   }
-  
 
   function handleModalCancel() {
     appFeedbackMessage = 'Modification annulée.';
@@ -277,6 +276,12 @@
     formMessage = '';
     appFeedbackMessage = '';
   }
+
+  function handleLogout() {
+    localStorage.clear();
+    sessionStorage.clear();
+    goto('/login');
+  }
 </script>
 
 <svelte:head>
@@ -285,19 +290,27 @@
   <link rel="stylesheet" href="https://cdn.linearicons.com/free/1.0.0/icon-font.min.css" />
 </svelte:head>
 
-  <div class="container mt-5">
-    <div class="h-100 bg-custom">
-          <div class="container w-100">
-            <div class="modal-content">
-              <div class="modal-body">
-                <h5 class="modal-title">
-                  <div class="fs-2 fw-bold mb-3 text-center">  
-                    <div class="modal-footer d-block text-center">
-
-                    <i class="lnr  lnr-arrow-left" style="float: left; font-weight: 900;  cursor: pointer;" on:click={()=>{goto("/family")}}></i>
-                Modifier le Profil
-              </div>
+<div class="container mt-5">
+  <div class="h-100 bg-custom">
+    <div class="container w-100">
+      <div class="modal-content">
+        <div class="modal-body">
+      <div class="modal-header d-flex align-items-center justify-content-between">
+            <i
+              class="lnr lnr-arrow-left fs-4"
+              style="font-weight: 900;  cursor: pointer;"
+              on:click={() => {goto("/family")}}
+            ></i>
+            <h5 class="modal-title fw-bold text-center m-0">
+              Modifier le Profil
             </h5>
+            <button
+              class="btn btn-outline-danger btn-sm"
+              on:click={handleLogout}
+            >
+              Déconnexion
+            </button>
+          </div>
             <div class="divider row"></div>
             {#if appFeedbackMessage}
               <div
@@ -418,20 +431,18 @@
                       <em class="error invalid-feedback">{errors.birthday}</em>
                     {/if}
                   </div>
-                  
                   {#if formMessage}
                     <p class="text-danger mt-2 text-center">{formMessage}</p>
                   {/if}
-                      <div class="modal-footer d-block text-center">
-
-                  <button
-                    type="submit"
-                    on:click={submitActualFormChanges}
-                    class="btn-wide btn-pill btn-shadow btn-hover-shine btn btn-custom btn-lg"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Traitement...' : 'Confirmer les modifications'}
-                  </button>
+                  <div class="modal-footer d-block text-center">
+                    <button
+                      type="submit"
+                      on:click={submitActualFormChanges}
+                      class="btn-wide btn-pill btn-shadow btn-hover-shine btn btn-custom btn-lg"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Traitement...' : 'Confirmer les modifications'}
+                    </button>
                   </div>
                 </form>
               {:else}
@@ -460,22 +471,19 @@
                     />
                     {#if errors.password_confirm}
                       <em class="error invalid-feedback">{errors.password_confirm}</em>
-                    {/if}
+                   {/if}
                   </div>
-           
-                  
                   {#if formMessage}
                     <p class="text-danger mt-2 text-center">{formMessage}</p>
                   {/if}
-                      <div class="modal-footer d-block text-center">
-
-                  <button
-                    type="submit"
-                    class="btn-wide btn-pill btn-shadow btn-hover-shine btn btn-custom btn-lg"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Traitement...' : 'Confirmer les modifications'}
-                  </button>
+                  <div class="modal-footer d-block text-center">
+                    <button
+                      type="submit"
+                      class="btn-wide btn-pill btn-shadow btn-hover-shine btn btn-custom btn-lg"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Traitement...' : 'Confirmer les modifications'}
+                    </button>
                   </div>
                 </form>
               {/if}
@@ -490,7 +498,6 @@
 <PwdModal bind:show={showModal} on:confirm={handlePasswordConfirm} on:cancel={handleModalCancel} />
 
 <style>
- 
   .pp-display {
     width: 150px;
     height: 150px;
